@@ -1,10 +1,10 @@
-// import { KeyboardAvoidingView } from 'react-native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Feather';
 import {
-  FlatList, KeyboardAvoidingView,
+  KeyboardAvoidingView,
   SafeAreaView, ScrollView, TouchableOpacity,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 export const AlignView = styled.View`
 display: flex;
@@ -26,15 +26,17 @@ export const BodyView = styled.View`
 display: flex;
 flex-direction: row;
 align-items: center;
-height: 72px;
+/* height: 72px; */
+height: 100%;
 padding: 12px;
+background-color: #fff;
 /* background-color: #73c479; */
 `;
 
 export const Container = styled(SafeAreaView)`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   align-items: center;
   height: 100%;
   width: 100%;
@@ -44,10 +46,10 @@ export const Container = styled(SafeAreaView)`
 export const ConversationView = styled.View`
 display: flex;
 flex-direction: column;
-height: 80%;
+height: 90%;
 width: 100%;
 overflow: scroll;
-margin-bottom: 40%;
+/* margin-bottom: 40%; */
 /* background-color: #4433ee; */
 `;
 
@@ -72,21 +74,29 @@ export const Header = styled.View`
 display: flex;
 flex-direction: row;
 align-items: center;
-justify-content: space-between;
+/* justify-content: space-between; */
 /* height: 66px; */
-height: auto;
+height: 10%;
 width: 100%;
-background-color: #f5f5f5;
-/* background-color: #334466; */
-background-color: ${props => props.userIsWorker === true
+/* background-color: #fff; */
+background-color: #334466;
+/* background-color: ${props => props.userIsWorker === true
   ? '#f0fff0'
   : '#E7EEFF'
-}
+} */
 `;
 
 export const HrLine = styled.View`
 width: 90%;
-border: 1px #f0f0f0;
+border-width: 0.5px;
+border-color: #ddd;
+margin: 0 auto;
+`;
+
+export const HrDivider = styled.View`
+width: 100%;
+border-width: 0.5px;
+border-color: #ddd;
 margin: 0 auto;
 `;
 
@@ -125,13 +135,17 @@ display: flex;
 flex-direction: column;
 align-items: flex-end;
 max-width: 80%;
-border-radius: 8px;
+border-radius: 16px;
 padding: 4px;
 margin: 0;
-/* background-color: #73a6c4; */
+border-width: 1px;
+border-color: ${ props => props.sender === 'user'
+  ? '#fff'
+  : '#000'
+};
 background-color: ${ props => props.sender === 'user'
-  ? '#daf1e0'
-  : '#b4c7db'
+  ? '#E7EEFF'
+  : '#fff'
 };
 /* background-color: #4ee; */
 `;
@@ -219,14 +233,14 @@ text-align: left;
 margin: 0 auto;
 `;
 
-export const ParsedKeyboardAvoidingView = styled.KeyboardAvoidingView`
-display: flex;
-flex-direction: column;
-align-items: center;
-height: auto;
-width: 100%;
-background-color: #4433ee;
-`;
+// export const ParsedKeyboardAvoidingView = styled.KeyboardAvoidingView`
+// display: flex;
+// flex-direction: column;
+// align-items: center;
+// height: auto;
+// width: 100%;
+// background-color: #4433ee;
+// `;
 
 export const ReplyContainer = styled.View`
   display: flex;
@@ -247,7 +261,7 @@ export const ReplyView = styled.View`
   width: 100%;
   padding: 0 8px;
   margin: 0;
-  background-color: #f5f5f5;
+  background-color: #fff;
 `;
 
 export const ReplyOnTopView = styled.View`
@@ -297,12 +311,13 @@ export const SendInput = styled.TextInput`
   flex-direction: row;
   align-items: center;
   height: auto;
+  min-height: 40px;
   width: 80%;
   margin: 8px 0;
   padding: 6px 12px;
-  border-radius: 16px;
+  border-radius: 32px;
   border-width: 1px;
-  border-color: #ccc;
+  border-color: #000;
   background-color: #fff;
 `;
 
@@ -311,15 +326,15 @@ export const SendButton = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 28px;
-  width: 28px;
+  height: 40px;
+  width: 40px;
   border: 1px solid #fff;
-  border-radius: 28px;
+  border-radius: 40px;
   margin: 0;
-  background-color: #4433ee;
+  background-color: #000;
 `;
 export const SendIcon = styled(Icon)`
-  font-size: ${Platform.OS === 'ios' ? '13px' : '12px'};
+  font-size: ${Platform.OS === 'ios' ? '15px' : '14px'};
   color: #fff;
 `;
 
@@ -328,10 +343,10 @@ export const SendButtonView = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 32px;
-  width: 32px;
-  border-radius: 32px;
-  border: 1px solid #4433ee;
+  height: 36px;
+  width: 36px;
+  border-radius: 36px;
+  border: 1px solid #000;
   margin: 0;
   /* background-color: #4ee; */
 `;

@@ -67,10 +67,18 @@ export function* signUp({ payload }) {
       gender,
       subscriber: false
     })
-    Alert.alert('Usuário cadastrado com sucesso!')
+    // Alert.alert('Usuário cadastrado com sucesso!')
+    Alert.alert(
+      'Success!',
+      `User ${user_name} created`
+    )
 
   } catch (error) {
-    Alert.alert('Falha ao cadastrar usuário.')
+    console.log(error)
+    Alert.alert(
+      'Error: Sign up failed',
+      'e-mail address or phonenumber may already exist. Please contact support.'
+    )
   }
 }
 

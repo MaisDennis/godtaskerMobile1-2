@@ -29,7 +29,11 @@ color: #fff;
 // `;
 
 export const Container = styled.SafeAreaView`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   height: 100%;
+
   /* background-color: #ff0; */
 `;
 
@@ -40,14 +44,15 @@ width: 100%;
 `;
 
 export const FormInputWorkerPassword = styled(TextInput)`
-  height: 56px;
+  height: 44px;
   width: 80%;
-  /* border-radius: 4px; */
-  border: 1px solid #999;
+  border-radius: 8px;
+  border-width: 1px;
+  border-color: #000;
   margin: 8px auto;
   padding-left: 12px;
-  color: #222;
-  background-color: #f5f5f5;
+  color: #000;
+  background-color: #ddd;
   /* background: #c4ce3b; */
 `;
 
@@ -59,28 +64,39 @@ export const FormWorker = styled.View`
 `;
 
 export const ImageLogo = styled.Image`
-  width: 148px;
-  height: 148px;
+  width: 102px;
+  height: 98px;
   margin: auto;
 `;
 
 export const ImageGodtaskerFont = styled.Image`
-  width: 240px;
-  height: 80px;
-  margin: auto;
+  width: 210px;
+  height: 72px;
+  margin: 12px auto 12px;
+`;
+
+export const Label = styled.Text`
+font-size: 16px;
+/* font-weight: bold; */
+width: 340px;
+text-align: center;
+margin: 24px auto 0;
+/* background: #999; */
+color: #000;
 `;
 
 export const PhoneMask = styled(InputMask)`
-  height: 56px;
+  height: 44px;
   width: 80%;
-  /* border-radius: 4px; */
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  border: 1px solid #999;
+  border-radius: 8px;
+  /* border-top-left-radius: 8px;
+  border-top-right-radius: 8px; */
+  border-width: 1px;
+  border-color: #000;
   padding-left: 12px;
   margin: 8px auto;
-  color: #222;
-  background-color: #f5f5f5;
+  color: #000;
+  background-color: #ddd;
 `;
 
 export const SubmitButton = styled(TouchableOpacity)`
@@ -88,12 +104,13 @@ export const SubmitButton = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 56px;
+  height: 44px;
   width: 80%;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  margin: 8px auto;
-  background-color: #666;
+  /* border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px; */
+  border-radius: 8px;
+  margin: 8px auto 0;
+  background-color: #000;
   /* width: 148px; */
   /* width: 50%; */
 `;
@@ -104,17 +121,19 @@ export const StyledKeyboardAvoiding = styled(KeyboardAvoidingView)`
 `;
 
 export const SignUpButton = styled(Button)`
-  height: 56px;
-  width: auto;
-  margin: 0 auto;
+  height: 44px;
+  width: 80%;
+  border-radius: 8px;
+  /* margin: 32px auto; */
   padding: 0 16px;
-  /* background-color: #f5f; */
+  margin-top: 8px;
+  background-color: #18A0FB;
 `;
 
 export const SignUpText = styled.Text`
   font-size: 16px;
-  /* font-weight: bold; */
-  color: #4433ee;
+  font-weight: bold;
+  color: #fff;
   /* color: #44ccee; */
 
 `;
@@ -125,10 +144,12 @@ export const StyledScrollView = styled.ScrollView`
 
 export const Title = styled.Text`
 font-size: 16px;
-font-weight: bold;
-margin: 16px auto 8px;
+/* font-weight: bold; */
+width: 340px;
+text-align: center;
+margin: 8px auto;
 /* background: #999; */
-color: #58595B;
+color: #000;
 `;
 
 export const Wrapper = styled.View`
@@ -141,6 +162,6 @@ export const Wrapper = styled.View`
   min-width: 320px;
   border-radius: 4px;
   padding-bottom: 12px;
-  margin: 24px auto;
-  background-color: #f5f5f5;
+  margin: 0 auto;
+  /* background-color: #f5f5f5; */
 `;

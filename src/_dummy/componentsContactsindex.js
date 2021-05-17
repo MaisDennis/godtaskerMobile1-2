@@ -22,32 +22,20 @@ export default function Contacts({ navigation, data }) {
   const [workerData, setWorkerData] = useState();
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   getPhoto(data.phonenumber)
-  // }, [updateContacts])
+  useEffect(() => {
+    getPhoto(data.phonenumber)
+  }, [updateContacts])
 
-  // async function getPhoto(phonenumber) {
-  //   const worker = await api.get('workers/individual', {
-  //     params: {phonenumber: phonenumber},
-  //   })
-  //   setWorkerData(worker.data)
-  //   return worker
-  // }
+  async function getPhoto(phonenumber) {
+    const worker = await api.get('workers/individual', {
+      params: {phonenumber: phonenumber},
+    })
+    setWorkerData(worker.data)
+    return worker
+  }
 
   function handleToggleContact() {
     setToggleContact(!toggleContact)
-  }
-
-  function handleWorkerPage() {
-    navigation.navigate('WorkerPage', {
-      id: data.id,
-      first_name: data.first_name,
-      last_name: data.last_name,
-      worker_name: data.worker_name,
-      department: data.department,
-      // phonenumber: data.phonenumber,
-      avatar: data.avatar.url,
-    })
   }
 
   function handleContactTasks() {
@@ -84,22 +72,22 @@ export default function Contacts({ navigation, data }) {
   }
   // ---------------------------------------------------------------------------
   return (
-    <Container onPress={handleWorkerPage}>
+    <Container>
       {/* <TouchableOpacity onPress={handleToggleContact}> */}
       <Body>
         <UserInfoView>
-          { data === undefined || data.avatar === null
-            ? (
-              <ImageBackgroundView>
-                <Image/>
-              </ImageBackgroundView>
-            )
-            : (
-              <ImageBackgroundView>
-                <Image source={{ uri: data.avatar.url }}/>
-              </ImageBackgroundView>
-            )
-          }
+          { workerData === undefined || workerData.avatar === null
+                    ? (
+                      <ImageBackgroundView>
+                        <Image/>
+                      </ImageBackgroundView>
+                    )
+                    : (
+                      <ImageBackgroundView>
+                        <Image source={{ uri: workerData.avatar.url }}/>
+                      </ImageBackgroundView>
+                    )
+                  }
           <TextView>
             <TextWorkerName>{data.worker_name}</TextWorkerName>
             <TextNameView>

@@ -276,10 +276,10 @@ export default function Messages({ data, navigation }) {
           <BodyView>
             <MainView>
               <TitleView>
-                <TitleWrapper>
+                {/* <TitleWrapper>
                   <TitleIcon name="clipboard" colorProp={worker_id === data.worker_id}/>
                   <TitleText colorProp={worker_id === data.worker_id}>{data.name}</TitleText>
-                </TitleWrapper>
+                </TitleWrapper> */}
                 { (worker_id === data.worker_id)
                   ? (
                     <SenderText>{senderUserName}</SenderText>
@@ -289,7 +289,11 @@ export default function Messages({ data, navigation }) {
                   )
                 }
               </TitleView>
-              <LastMessageView>
+              <LastMessageView
+                colors={['#fff', '#ddd']}
+                start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+                // style={{ width: `${statusResult}%`}}
+              >
                 { lastMessage && (
                   <LastMessageText>{lastMessage}</LastMessageText>
                 )}
@@ -309,7 +313,7 @@ export default function Messages({ data, navigation }) {
                       null
                     )
                     : (
-                      <MessageIcon name="message-circle">
+                      <MessageIcon name="message-square">
                         <UnreadMessageCountText>{hasUnread(messageBell)}</UnreadMessageCountText>
                       </MessageIcon>
                     )

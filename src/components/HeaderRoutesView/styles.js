@@ -7,7 +7,7 @@ export const AlignView = styled.View`
   align-self: center;
   width: 90%;
   height: 100%;
-  background: #F5F5F5;
+  background: #fff;
   /* background: #ee3; */
 `;
 
@@ -22,7 +22,8 @@ export const HeaderContainer = styled.View`
 
 export const HeaderText = styled.Text`
 color: #222;
-font-size: 12px;
+font-size: ${Platform.OS === 'ios' ? '17px' : '16px'};
+font-weight: bold;
 margin: 0 auto;
 padding: 2px;
 /* background: #F5F5; */

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableOpacity } from 'react-native'
+import { Alert, TouchableOpacity } from 'react-native'
 import { useSelector } from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
+import { Swipeable } from 'react-native-gesture-handler';
 // -----------------------------------------------------------------------------
 import {
   AddIcon,
@@ -86,12 +87,18 @@ export default function MessagesPage({ navigation, route }) {
     setTasks(filteredList)
     setInputState(input)
   }
+
+  const LeftActions = () => {
+    <HeaderTabView>
+      <Title>Hello</Title>
+    </HeaderTabView>
+  }
   // -----------------------------------------------------------------------------
   return (
     <Container>
       <Header>
         <SearchBarTextInput
-          placeholder='Procurar mensagem'
+          placeholder='Search'
           onChangeText={handleUpdateInput}
           value={inputState}
         />
@@ -115,6 +122,10 @@ export default function MessagesPage({ navigation, route }) {
             data={tasks}
             keyExtractor={item => String(item.id)}
             renderItem={({ item, index }) => (
+              <Swipeable
+                renderLeftActions={LeftActions}
+                onSwipeableLeftOpen={() => Alert.alert('Hi')}
+              >
               <Messages
                 key={index}
                 data={item}
@@ -122,6 +133,7 @@ export default function MessagesPage({ navigation, route }) {
                 resetTasks={resetTasks}
                 setResetTasks={setResetTasks}
               />
+              </Swipeable>
             )}
           />
         )

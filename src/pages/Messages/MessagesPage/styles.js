@@ -19,7 +19,7 @@ export const Header = styled.View`
   justify-content: center;
   height: 42px; /* maintain in px. */
   width: 100%;
-  background-color: #f5f5f5;
+  background-color: #fff;
   /* background-color: #f5f; */
 `;
 

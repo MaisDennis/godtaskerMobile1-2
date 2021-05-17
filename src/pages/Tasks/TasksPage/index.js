@@ -7,13 +7,13 @@ import pt from 'date-fns/locale/pt';
 import Task from '~/components/Tasks';
 import api from '~/services/api';
 import HeaderView from '~/components/HeaderView';
-import godtaskerFont from '~/assets/detective/godtaskerFontPlainGreySmall.png';
+import logo from '~/assets/detective/detective_remake.png'
 import {
   AddIcon,
   Container,
   List,
   Header, HeaderImage, HeaderTabView, HeaderTouchable,
-  SpaceView,
+  SearchBarTextInput, SpaceView,
   Title, TitleNumber,
   UpperTabView, UpperTabText,
 } from './styles';
@@ -63,13 +63,15 @@ export default function Dashboard({ navigation }) {
       <Header>
         <SpaceView>
           <HeaderImage
-            source={godtaskerFont}
+            source={logo}
           />
         </SpaceView>
 
-        <HeaderView data={todayDate}/>
+        <SearchBarTextInput
+          placeholder='Search'
+        />
         <HeaderTouchable onPress={() => loadTasks()}>
-          <AddIcon name='refresh-cw' size={21}/>
+          <AddIcon name='refresh-cw' size={20}/>
         </HeaderTouchable>
       </Header>
 
@@ -94,7 +96,7 @@ export default function Dashboard({ navigation }) {
             keyExtractor={item => String(item.id)}
             renderItem={({ item, index }) => (
               <>
-                <TitleNumber>{index+1}</TitleNumber>
+                {/* <TitleNumber>{index+1}</TitleNumber> */}
                 <Task
                   key={item.id}
                   data={item}

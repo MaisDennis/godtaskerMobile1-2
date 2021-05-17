@@ -10,13 +10,15 @@ import {
   AllIcon,
   ButtonText,
   Container,
+  EyeButton, EyeIcon,
   Form, FormInput,
   GenderDiv,
+  IconView,
   LabelText,
   // ImageGodtaskerFont, ImageLogo,
   Options,
   PhoneMask,
-  RadioButtonView, RadioButtonTag, RadioButtonTagConfirmPhoto,
+  RadioButtonView, RadioButtonTag,
   RadioButtonLabel, RadioButtonOuter, RadioButtonInner0,
   RadioButtonInner1, RadioButtonInner2, RadioButtonInner3,
   RadioButtonInner4, RadioButtonLabelText,
@@ -40,13 +42,78 @@ export default function SignUp({ navigation, route }) {
   const [birthDate, setBirthDate] = useState();
   const [gender, setGender] = useState("feminino");
   const [signUpError, setSignUpError] = useState();
+  const [secureText, setSecureText] = useState(true);
   // const test = route.params.phonenumber;
   // console.log(test)
 
   const genderOptions = [ 'feminino', 'masculino', 'alien', 'outro', '']
+  const placeHolderColor = '#999';
 
   function handleSubmit() {
-    // console.log(schema)
+    // if (!firstName || !lastName) {
+    //   Alert.alert(
+    //     'Please complete your name and lastname',
+    //     'Your bio will show your full name',
+    //     [{ style: "default" }],
+    //     { cancelable: true },
+    //   );
+    //   return;
+    // }
+    // if (!userName) {
+    //   Alert.alert(
+    //     'Please complete username',
+    //     'Your username is unique to you in Godtasker',
+    //     [{ style: "default" }],
+    //     { cancelable: true },
+    //   );
+    //   return;
+    // }
+    // if (!email) {
+    //   Alert.alert(
+    //     'Please enter e-mail address',
+    //     '',
+    //     [{ style: "default" }],
+    //     { cancelable: true },
+    //   );
+    //   return;
+    // }
+    // if (!phonenumber || (phonenumber.length < 15)) {
+    //   Alert.alert(
+    //     'Please enter a valid phonenumber',
+    //     'Ex. (99) 91234-1234',
+    //     [{ style: "default" }],
+    //     { cancelable: true },
+    //   );
+    //   return;
+    // }
+    // if (!birthDate || (birthDate.length < 10)) {
+    //   Alert.alert(
+    //     'Please enter a valid birth date',
+    //     'Ex. 01/01/2001',
+    //     [{ style: "default" }],
+    //     { cancelable: true },
+    //   );
+    //   return;
+    // }
+    // if ((password.length < 8) || (confirmPassword.length < 8)) {
+    //   Alert.alert(
+    //     'Please enter a password and confirm password',
+    //     'Mininum 8 charaters',
+    //     [{ style: "default" }],
+    //     { cancelable: true },
+    //   );
+    //   return;
+    // }
+    // if (password  !== confirmPassword) {
+    //   Alert.alert(
+    //     'Password and confirm password do not match',
+    //     'Use "eye" to visualize password, if needed',
+    //     [{ style: "default" }],
+    //     { cancelable: true },
+    //   );
+    //   return;
+    // }
+
     try {
     const unmaskedPhoneNumber = (
       maskedPhoneNumber => maskedPhoneNumber.replace(/[()\s-]/g, '')
@@ -61,9 +128,15 @@ export default function SignUp({ navigation, route }) {
       navigation.goBack();
     }
     catch (error) {
-      Alert.alert('Erro nos dados')
+      Alert.alert(
+        'Error in data',
+        `${error}`
+      )
     }
+  }
 
+  function handleSecureText() {
+    setSecureText(!secureText)
   }
   // -----------------------------------------------------------------------------
   return (
@@ -73,21 +146,21 @@ export default function SignUp({ navigation, route }) {
         <ImageGodtaskerFont source={godtaskerFont} /> */}
         <Form contentContainerStyle={{ alignItems: 'center' }}>
           <Wrapper>
-            <AllIcon name='user'/>
+            <IconView>
+              <AllIcon name='user'/>
+            </IconView>
             <FormInput
               autoCorrect={false}
-              autoCapitalize="none"
-              placeholder="Nome"
-              placeholderTextColor="#ccc"
+              placeholder="Name"
+              placeholderTextColor={placeHolderColor}
               returnKeyType="next"
               value={firstName}
               onChangeText={setFirstName}
             />
             <FormInput
               autoCorrect={false}
-              autoCapitalize="none"
-              placeholder="Sobrenome"
-              placeholderTextColor="#ccc"
+              placeholder="Lastname"
+              placeholderTextColor={placeHolderColor}
               returnKeyType="next"
               value={lastName}
               onChangeText={setLastName}
@@ -95,14 +168,26 @@ export default function SignUp({ navigation, route }) {
             <FormInput
               autoCorrect={false}
               autoCapitalize="none"
-              placeholder="Nome de usuário"
-              placeholderTextColor="#ccc"
+              placeholder="Username"
+              placeholderTextColor={placeHolderColor}
               returnKeyType="next"
               value={userName}
               onChangeText={setUserName}
             />
             {/* <HrLine/> */}
-            <AllIcon name='info'/>
+            <IconView>
+              <AllIcon name='info'/>
+            </IconView>
+
+            <FormInput
+              keboardType="email-address"
+              autoCorrect={false}
+              autoCapitalize="none"
+              placeholder="e-mail"
+              placeholderTextColor={placeHolderColor}
+              value={email}
+              onChangeText={setEmail}
+            />
             <PhoneMask
               type={'cel-phone'}
               options={{
@@ -110,8 +195,8 @@ export default function SignUp({ navigation, route }) {
                 withDDD: true,
                 dddMask: '(99) ',
               }}
-              placeholder="DDD + Número de whatsapp"
-              placeholderTextColor="#ccc"
+              placeholder="Phonenumber"
+              placeholderTextColor={placeHolderColor}
 
               returnKeyType="next"
               value={phonenumber}
@@ -122,23 +207,23 @@ export default function SignUp({ navigation, route }) {
               options={{
                 format: 'DD/MM/YYYY',
               }}
-              placeholder="Data de nascimento (DD/MM/YYYY)"
-              placeholderTextColor="#ccc"
+              placeholder="Birthdate (DD/MM/YYYY)"
+              placeholderTextColor={placeHolderColor}
               returnKeyType="next"
               value={birthDate}
               onChangeText={setBirthDate}
             />
             <GenderDiv>
-              <LabelText>Gênero</LabelText>
+              <LabelText>Gender</LabelText>
               <RadioButtonView>
                 <RadioButtonTag onPress={() => setGender('feminino')}>
-                  <RadioButtonLabel>fem.</RadioButtonLabel>
+                  <RadioButtonLabel>female</RadioButtonLabel>
                   <RadioButtonOuter>
                     <RadioButtonInner1 switch={gender}/>
                   </RadioButtonOuter>
                 </RadioButtonTag>
                 <RadioButtonTag onPress={() => setGender('masculino')}>
-                  <RadioButtonLabel>masc.</RadioButtonLabel>
+                  <RadioButtonLabel>male</RadioButtonLabel>
                   <RadioButtonOuter>
                     <RadioButtonInner2 switch={gender}/>
                   </RadioButtonOuter>
@@ -150,33 +235,38 @@ export default function SignUp({ navigation, route }) {
                   </RadioButtonOuter>
                 </RadioButtonTag>
                 <RadioButtonTag onPress={() => setGender('outro')}>
-                  <RadioButtonLabel>outro</RadioButtonLabel>
+                  <RadioButtonLabel>other</RadioButtonLabel>
                   <RadioButtonOuter>
                     <RadioButtonInner4 switch={gender}/>
                   </RadioButtonOuter>
                 </RadioButtonTag>
               </RadioButtonView>
             </GenderDiv>
-            <FormInput
-              keboardType="email-address"
-              autoCorrect={false}
-              autoCapitalize="none"
-              placeholder="e-mail"
-              value={email}
-              onChangeText={setEmail}
-            />
             {/* <HrLine/> */}
-            <AllIcon name='unlock'/>
+
+            <IconView>
+              <AllIcon name='unlock'/>
+              <EyeButton onPress={handleSecureText}>
+                {secureText
+                  ? (<EyeIcon name='eye'/>)
+                  : (<EyeIcon name='eye-off'/>)
+                }
+              </EyeButton>
+            </IconView>
           <FormInput
-            secureTextEntry
-            placeholder="Sua senha secreta"
+            secureTextEntry = {secureText}
+            autoCapitalize="none"
+            placeholder="Password"
+            placeholderTextColor={placeHolderColor}
             returnKeyType="send"
             value={password}
             onChangeText={setPassword}
           />
           <FormInput
-            secureTextEntry
-            placeholder="Confirmar a senha"
+            secureTextEntry = {secureText}
+            autoCapitalize="none"
+            placeholder="Confirm password"
+            placeholderTextColor={placeHolderColor}
             returnKeyType="send"
             onSubmitEditing={handleSubmit}
             value={confirmPassword}
@@ -186,7 +276,7 @@ export default function SignUp({ navigation, route }) {
             <SignUpErrorText>{signUpError}</SignUpErrorText>
           )}
           <SubmitButton onPress={handleSubmit}>
-            <ButtonText>Enviar</ButtonText>
+            <ButtonText>Send</ButtonText>
           </SubmitButton>
           </Wrapper>
         </Form>

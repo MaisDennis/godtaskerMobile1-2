@@ -7,20 +7,18 @@ import pt from 'date-fns/locale/pt';
 import {
   AddIcon,
   Container,
-  DateText,
-  Header, HeaderImage, HeaderTabView, HeaderTouchable,
+  Header, HeaderTabView, HeaderTouchable,
   List,
-  SearchBarTextInput, SpaceView,
+  SearchBarTextInput,
   Title,
   UpperTabView, UpperTabText,
-  UserNameText,
 } from './styles'
 import HeaderView from '~/components/HeaderView'
 import logo from '~/assets/detective/detective_remake.png'
 import Contacts from '~/components/Contacts'
 import api from '~/services/api';
 
-export default function ContactsPage({ navigation }) {
+export default function FollowPage({ navigation }) {
   const userId = useSelector( state => state.user.profile.id)
   const user_name = useSelector(state => state.user.profile.user_name);
   const contacts_update = useSelector( state => state.contact.profile)
@@ -30,7 +28,7 @@ export default function ContactsPage({ navigation }) {
   const [inputState, setInputState] = useState('');
 
   useEffect(() => {
-    loadWorkers();
+    loadContacts(userId);
   }, [contacts_update]);
 
   const formattedDate = fdate =>
@@ -40,8 +38,8 @@ export default function ContactsPage({ navigation }) {
   const todayDate = formattedDate(new Date())
 
   async function loadContacts(userID) {
-    // console.log(userID)
-    const response = await api.get(`users/${userID}/contact-list`, {
+    console.tron.log(userID)
+    const response = await api.get(`users/${userID}/following`, {
     })
     setContacts(response.data)
     setDefaultContacts(response.data)
@@ -82,6 +80,8 @@ export default function ContactsPage({ navigation }) {
     navigation.navigate('ContactCreate')
   }
 
+
+
   async function loadWorkers(input) {
     setInputState(input)
     let response = await api.get('/workers', {
@@ -121,12 +121,13 @@ export default function ContactsPage({ navigation }) {
       </HeaderTabView>
       { contacts == ''
         ? (
-          <Title>Let's Search!</Title>
+          <Title>Não há contatos cadastrados.</Title>
         )
         : (
           <List
             data={contacts}
             keyExtractor={item => String(item.phonenumber)}
+
             renderItem={({ item }) => (
               <Contacts
                 key={item.phonenumber}

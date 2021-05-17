@@ -7,11 +7,13 @@ export const Container = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  height: 80%;
-  width: 80%;
-  border-radius: 4px;
-  border: 1px solid #999;
-  background: #fff;
+  height: 32px;
+  width: 50%;
+  border-radius: 8px;
+  border-width: 1px;
+  border-color: #000;
+  margin: 8px 0;
+  background-color: #ddd;
   /* background: #F5F5; */
 `;
 
@@ -22,7 +24,7 @@ export const MinusButton = styled(TouchableOpacity)`
   align-items: center;
   height: 100%;
   width: 25%;
-  /* background: #ccc; */
+  /* background: #43ee; */
 `;
 export const PlusButton = styled(TouchableOpacity)`
   display: flex;
@@ -34,16 +36,11 @@ export const PlusButton = styled(TouchableOpacity)`
 
 `;
 export const Input = styled.Text`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
   text-align: center;
-  height: 100%;
-  font-size: 12px;
-  line-height: 24px;
+  font-size: 14px;
   width: 50%;
-  color: #999;
-/* background: #F5F5; */
+  color: #000;
+  /* background: #F5F5; */
 `;
 export const NumberIcon = styled(Icon)`
   display: flex;
@@ -51,9 +48,9 @@ export const NumberIcon = styled(Icon)`
   align-items: center;
   height: auto;
   width: auto;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: bold;
   margin: auto;
-  color: #4433ee;
+  color: #000;
 /* background: #4433ee; */
 `;

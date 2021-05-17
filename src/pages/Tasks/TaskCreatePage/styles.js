@@ -22,18 +22,67 @@ export const AlignCheckBoxView = styled.View`
   flex-direction:column;
   align-items: flex-start;
   width: 100%;
+  margin: 8px 0 0;
   /* background-color: #ee4; */
+`;
+
+export const ButtonView = styled(TouchableOpacity)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 100%;
+  border-radius: 8px;
+  margin: 8px auto;
+  padding: 0 16px;
+  background-color: #000;
+`;
+
+export const ButtonView2 = styled(TouchableOpacity)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 100%;
+  border-radius: 8px;
+  /* border-width: 1px; */
+  /* border-color: #000; */
+  margin: 8px auto 8px;
+  padding: 0 16px;
+  background-color: #009966;
+`;
+
+// export const ButtonView = styled(TouchableOpacity)`
+//   display: flex;
+//   flex-direction: row;
+//   align-items: center;
+//   justify-content: center;
+//   height: 40px;
+//   width: 100%;
+//   border-radius: 8px;
+//   margin: 8px auto;
+//   padding: 0 16px;
+//   background-color: #000;
+// `;
+
+export const ButtonText = styled.Text`
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
 `;
 
 export const CheckBoxWrapper = styled.ScrollView`
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-height: 300px;
+  height: auto;
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 8px;
   /* border: 1px solid #ccc; */
   background-color: #fff;
+  /* background-color: #ee3; */
 `;
 export const CheckBoxView = styled.View`
   display: flex;
@@ -54,9 +103,12 @@ export const DateOptionsView = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  width: 90%;
+  width: 100%;
   border-radius: 4px;
-  padding: 0 8px;
+  border-width: 1px;
+  border-color: #000;
+  padding: 12px;
+  margin: 8px 0;
   /* background-color: #4433ee; */
   background-color: #ddd;
 
@@ -80,38 +132,46 @@ export const FormScrollView = styled.ScrollView`
   display: flex;
   width: 100%;
   padding: 12px 0;
-  background-color: #f5f5f5;
+  background-color: #fff;
+`;
+
+export const HrLine = styled.View`
+width: 100%;
+border: 0.5px #ddd;
+margin: 8px auto;
 `;
 
 export const Input = styled.TextInput`
   display: flex;
   font-size: 14px;
-  height: 48px;
+  min-height: 44px;
+  height: auto;
   width: 100%;
-  padding: 12px;
-  border-radius: 4px;
-  border: 1px solid #999;
-  color: #222;
-  background-color: #fff;
+  line-height: 20px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border-width: 1px;
+  border-color: #000;
+  margin: 8px 0;
+  color: #000;
+  background-color: #ddd;
 `;
+
 export const ItemWrapperView = styled.View`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 90%;
-  margin-bottom: 12px;
-  /* padding: 12px; */
-  align-items: flex-start;
-  /* background-color: #ff0;1                                                              */
+  width: 80%;
+  height: auto;
+  margin: 8px 0;
+  /* background-color: #ff0; */
 `;
 
 export const LabelText = styled.Text`
-  max-width: 80%;
-  /* font-size: ${Platform.OS === 'ios' ? '13px' : '12px'}; */
-  font-size: 14px;
-  font-weight: normal;
-  color: #666;
-  margin: 4px;
+  font-weight: bold;
+  font-size: ${Platform.OS === 'ios' ? '15px' : '14px'};
+  margin-right: 8px;
+  color: #000;
 `;
 
 export const ModalView = styled.View`
@@ -146,9 +206,14 @@ export const RadioButtonView = styled.View`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  width: 90%;
+  justify-content: flex-start;
+  width: 100%;
   height: auto;
+  /* border-radius: 8px;
+  border-width: 1px;
+  border-color: #000; */
+  margin: 8px 0;
+  /* padding-bottom: 4px; */
   /* background-color: #4ee; */
 `;
 export const RadioButtonTag = styled(TouchableOpacity)`
@@ -158,7 +223,7 @@ export const RadioButtonTag = styled(TouchableOpacity)`
   justify-content: center;
   width: 20%;
   height: auto;
-  margin: 12px 8px;
+  margin: 0 8px;
   /* background-color: #999; */
 `;
 export const RadioButtonTagConfirmPhoto = styled(TouchableOpacity)`
@@ -166,26 +231,21 @@ export const RadioButtonTagConfirmPhoto = styled(TouchableOpacity)`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 40%;
+  width: 20%;
   height: auto;
-  margin: 8px;
+  margin: 0 8px;
   /* background-color: #999; */
 `;
 
 export const RadioButtonLabel = styled.Text`
   max-width: 100%;
-  font-size: ${Platform.OS === 'ios' ? '13px' : '12px'};
-  /* font-size: 14px; */
-  font-weight: normal;
-  margin: 4px;
 `;
 export const RadioButtonLabelText = styled.Text`
   max-width: 100%;
-  /* font-size: ${Platform.OS === 'ios' ? '13px' : '12px'}; */
-  font-size: 14px;
-  font-weight: normal;
-  color: #666;
-  margin: 4px;
+  font-size: ${Platform.OS === 'ios' ? '15px' : '14px'};
+  font-weight: bold;
+  color: #000;
+
 `;
 
 export const RadioButtonOuter = styled.View`
@@ -196,8 +256,8 @@ export const RadioButtonOuter = styled.View`
   width: 16px;
   height: 16px;
   border-radius: 16px;
-  border-width: 0.5px;
-  border-color: #666;
+  border-width: 1px;
+  border-color: #000;
   margin-top: 8px;
   background-color: #fff;
 
@@ -206,103 +266,33 @@ export const RadioButtonInner0 = styled.View`
   width: 12px;
   height: 12px;
   border-radius: 12px;
-  background-color: ${props => props.switch === 0 ? '#666' : '#fff'};
+  background-color: ${props => props.switch === 0 ? '#000' : '#ddd'};
 `;
 export const RadioButtonInner1 = styled.View`
   width: 12px;
   height: 12px;
   border-radius: 12px;
-  background-color: ${props => props.switch === 1 ? '#666' : '#fff'};
+  background-color: ${props => props.switch === 1 ? '#000' : '#ddd'};
 `;
 export const RadioButtonInner2 = styled.View`
   width: 12px;
   height: 12px;
   border-radius: 12px;
-  background-color: ${props => props.switch === 2 ? '#666' : '#fff'};
+  background-color: ${props => props.switch === 2 ? '#000' : '#ddd'};
 `;
 export const RadioButtonInner3 = styled.View`
   width: 12px;
   height: 12px;
   border-radius: 12px;
-  background-color: ${props => props.switch === 3 ? '#666' : '#fff'};
+  background-color: ${props => props.switch === 3 ? '#000' : '#ddd'};
 `;
 export const RadioButtonInner4 = styled.View`
   width: 12px;
   height: 12px;
   border-radius: 12px;
-  background-color: ${props => props.switch === 4 ? '#666' : '#fff'};
+  background-color: ${props => props.switch === 4 ? '#000' : '#ddd'};
 `;
 
-
-export const SubTaskView = styled.View`
-    display: flex;
-  flex-direction: row;
-  align-items: center;
-  height: auto;
-  width: 100%;
-  border-radius: 4px;
-  /* background-color: #f5f; */
-`;
-export const SubTaskItemView = styled.View`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: auto;
-  width: 100%;
-`;
-export const SubTaskButtonView = styled.View`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  height: auto;
-  width: 25%;
-  /* background-color: #44ccee; */
-`;
-export const SubTaskLabelText = styled.Text`
-  font-size: 14px;
-  font-weight: normal;
-  color: #666;
-  width: 5%;
-  /* margin: 4px; */
-`;
-export const SubTaskInput = styled.TextInput`
-  display: flex;
-  height: auto;
-  width: 100%;
-  padding: 12px;
-  border-radius: 4px;
-  border: 1px solid #999;
-  background-color: #fff;
-`;
-export const SubTaskText = styled.Text`
-  font-size: 14px;
-  font-weight: normal;
-  color: #222;
-  /* height: 100%; */
-  width: 75%;
-  /* margin: 4px; */
-  /* background-color: #f5f; */
-`;
-export const SubTaskWeigeText = styled.Text`
-  font-size: 14px;
-  font-weight: normal;
-  color: #222;
-  /* height: 100%; */
-  width: 40%;
-  /* margin: 4px; */
-  /* background-color: #f5f; */
-`;
-export const SubTaskIcon = styled(Icon)`
-  height: auto;
-  width: auto;
-  font-size: 18px;
-  font-weight: normal;
-  /* text-align: center; */
-  margin: auto;
-  color: #4433ee;
-  /* background-color: #111; */
-`;
 export const SubTaskButton = styled(TouchableOpacity)`
   display: flex;
   flex-direction: row;
@@ -312,20 +302,164 @@ export const SubTaskButton = styled(TouchableOpacity)`
   width: 50%;
   /* background-color: #666; */
 `;
+
+export const SubTaskButtonView = styled.View`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  height: 32px;
+  width: 100%;
+  /* background-color: #44ccee; */
+`;
+
+export const SubTaskCancelIcon = styled(Icon)`
+  height: auto;
+  width: auto;
+  font-size: 20px;
+  font-weight: normal;
+  /* text-align: center; */
+  margin: auto;
+  color: #AE1919;
+  /* background-color: #111; */
+`;
+
+export const SubTaskEditIcon = styled(Icon)`
+  height: auto;
+  width: auto;
+  font-size: 18px;
+  font-weight: normal;
+  /* text-align: center; */
+  margin: auto;
+  color: #000;
+  /* background-color: #111; */
+`;
+
+
+export const SubTaskIcon = styled(Icon)`
+  height: auto;
+  width: auto;
+  font-size: 20px;
+  font-weight: normal;
+  /* text-align: center; */
+  margin: auto;
+  color: #4433ee;
+  /* background-color: #111; */
+`;
+
+export const SubTaskInput = styled.TextInput`
+  display: flex;
+  height: auto;
+  width: 100%;
+  line-height: 20px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border-width: 1px;
+  border-color: #000;
+  margin: 8px 0;
+  background-color: #ddd;
+
+`;
+
+export const SubTaskLabelText = styled.Text`
+  width: 10%;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
+  /* margin: 4px; */
+`;
+
+export const SubTaskLeftView = styled.View`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 75%;
+  /* background-color: #f5f; */
+`;
+
+export const SubTaskRightView = styled.View`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 25%;
+  /* background-color: #f5f; */
+`;
+
+export const SubTaskTag = styled.View`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* justify-content: space-between; */
+  height: auto;
+  width: 100%;
+  /* margin: 8px 0; */
+  /* background-color: #44ccee; */
+`;
+
+export const SubTaskText = styled.Text`
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 20px;
+  /* height: 100%; */
+  width: 90%;
+
+  /* margin: 4px; */
+  color: #000;
+  /* background-color: #f5f; */
+`;
+
+export const SubTaskWeigeText = styled.Text`
+  font-size: 14px;
+  font-weight: normal;
+  color: #222;
+  /* height: 100%; */
+  /* text-align: right; */
+  width: auto;
+  /* margin: 4px; */
+  /* background-color: #4433ee; */
+`;
+
+export const SubTaskWrapper = styled.View`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: auto;
+  width: 100%;
+  /* border-width: 1px;
+  border-color: #000; */
+  border-radius: 8px;
+  padding: 0 8px;
+  margin: 8px 0;
+  /* background-color: #999; */
+`;
+
+export const SubTaskView = styled.View`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
+  width: 100%;
+  /* border-radius: 4px;
+  border-width: 1px;
+  border-color: #000; */
+  /* background-color: #f5f; */
+`;
+
 export const SubmitButton = styled(TouchableOpacity)`
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 48px;
+  height: 40px;
   width: 100%;
-  border-radius: 4px;
-  margin: 16px 0 24px 0;
-  background-color: #4433ee;
+  border-radius: 8px;
+  margin: 0 auto 40px;
+  padding: 0 16px;
+  background-color: #18A0FB;
 `;
 export const SubmitButtonText = styled.Text`
   font-size: 14px;
-  font-weight: 700;
+  font-weight: bold;
   color: #fff;
 `;
 
@@ -339,13 +473,13 @@ export const SubmitView = styled.View`
   width: 40px;
   margin: 0 4px 24px 4px;
   border-radius: 40px;
-  background-color: #4433ee;
+  /* background-color: #4433ee; */
 `;
 
 export const SubmitWrapper = styled.View`
 height: 100px;
 width: 100%;
-background-color: #4433ee;
+/* background-color: #4433ee; */
 `;
 
 export const TitleText = styled.Text`
@@ -353,48 +487,33 @@ export const TitleText = styled.Text`
   font-size: 16px;
   color: #222;
 `;
-export const TextWeigeView = styled.View`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: auto;
-  width: 100%;
-`;
 
 export const WeigeView = styled.View`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   height: auto;
-  width: 90%;
-  margin: 21px;
-  /* padding: 12px; */
+  width: 100%;
+  /* margin: 8px 0; */
   /* background-color: #f00; */
 `;
+
 export const WeigeTagView = styled.View`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: flex-end;
+  height: 32px;
+  width: 100%;
+  padding: 0 12px;
+  /* background-color: #999; */
+`;
 
-  height: auto;
-  width: 75%;
-  /* background-color: #111; */
-`;
 export const WeigeText = styled.Text`
-  font-size: 14px;
-  font-weight: normal;
-  color: #666;
-  margin-right: 12px;
-  /* width: 5%; */
-`;
-export const WeigeButton = styled(TouchableOpacity)`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  height: 100%;
-  width: auto;
-  margin-left: 60px;
-  /* background-color: #f5f; */
+font-weight: bold;
+  font-size: ${Platform.OS === 'ios' ? '15px' : '14px'};
+  margin-right: 8px;
+  color: #000;
+  /* background-color: #f00; */
 `;

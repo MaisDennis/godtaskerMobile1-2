@@ -5,7 +5,7 @@ import { TouchableOpacity } from 'react-native'
 export const AddIcon = styled(FeatherIcon)`
 font-weight: 700;
 margin: 0 16px;
-color: #666;
+color: #000;
 `;
 
 export const Container = styled.SafeAreaView`
@@ -18,12 +18,12 @@ flex-direction: row;
 align-items: center;
 justify-content: space-between;
 height: 42px; /* maintain in px. */
-background-color: #f5f5f5;
+background-color: #fff;
 /* background-color: #f00; */
 `;
 export const HeaderImage = styled.Image`
-height: 32px;
-width: 96px;
+height: 30px;
+width: 32px;
 margin: 0 16px;
 /* background: #f00; */
 `;
@@ -34,6 +34,7 @@ justify-content: space-between;
 width: 100%;
 height: auto;
 padding: 4px 0;
+background-color: #fff;
 /* background-color: #f5f; */
 `;
 export const HeaderTouchable = styled(TouchableOpacity)`
@@ -52,13 +53,22 @@ export const List = styled.FlatList.attrs({
   height: 100%;
 `;
 
+export const SearchBarTextInput = styled.TextInput`
+  height: 80%;
+  width: 50%;
+  border-radius: 8px;
+  padding: 4px 12px;
+  margin: 0 auto;
+  background-color: #ddd;
+`;
+
 export const SpaceView = styled.View`
   display: flex;
   flex-direction: row;
   align-items: center;
   height: auto;
   width: 30%;
-  background-color: #f5f5f5;
+  background-color: #fff;
 /* background-color: #f5f; */
 `;
 
@@ -86,9 +96,10 @@ export const UpperTabView = styled(TouchableOpacity)`
   width: 25%;
   border-radius: 16px;
   margin: 4px auto;
-  background-color: #666;
+  background-color: #000;
 `;
 export const UpperTabText = styled.Text`
   font-size: 12px;
+  font-weight: bold;
   color: #fff;
 `;

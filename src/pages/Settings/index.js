@@ -45,7 +45,7 @@ export default function SettingsPage({ navigation }) {
   // ---------------------------------------------------------------------------
   return (
     <Container>
-      <Header>
+      {/* <Header>
         <SpaceView>
           <HeaderImage
             source={godtaskerFont}
@@ -53,7 +53,7 @@ export default function SettingsPage({ navigation }) {
         </SpaceView>
         <HeaderView data="Configurações"/>
         <SpaceView/>
-      </Header>
+      </Header> */}
       <UserProfileView>
         { userData === undefined || userData.avatar === null
           ? (

@@ -27,7 +27,7 @@ export default function NumberInput({ numberInputValue, setNumberInputValue }) {
   return (
     <Container>
       <MinusButton onPress={handleMinus}>
-        <NumberIcon name="minus"/>
+        <NumberIcon name="minus-circle"/>
       </MinusButton>
       <Input
         value={numberInputValue}
@@ -35,7 +35,7 @@ export default function NumberInput({ numberInputValue, setNumberInputValue }) {
 
       >{numberInputValue}</Input>
       <PlusButton onPress={handlePlus}>
-        <NumberIcon name="plus"/>
+        <NumberIcon name="plus-circle"/>
       </PlusButton>
     </Container>
   )

@@ -2,32 +2,29 @@
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import Modal from 'react-native-modal';
 import { format, parseISO } from 'date-fns';
 import CheckBox from '@react-native-community/checkbox'; //https://github.com/react-native-checkbox/react-native-checkbox
 import firestore from '@react-native-firebase/firestore';
 import pt from 'date-fns/locale/pt';
 // -----------------------------------------------------------------------------
 import {
-  AlignDetailsView, AlignCheckBoxView,
-  BackButton,
-  BodyView, BodyWrapper, ButtonView, BottomHeaderView,
-  BellIcon, ButtonText,
-  CenterView, CheckBoxView, Container,
+  AsideView, AlignView,
+  AlignDatesView, AlignDetailsView, AlignCheckBoxView,
+  ButtonView, BottomHeaderView,
+  BellIcon,
+  ConfirmButton, CheckBoxView, Container,
   DescriptionView, DescriptionBorderView, DescriptionSpan,
   DatesAndButtonView, DueTimeView, DueTime, DetailsView,
-  IconsView,
+  HeaderView, HrLine,
   Image, ImageView, ImageWrapper, InnerStatusView,
-  Label, LabelInitiated, LabelEnded, LeftView,
-  ModalView,
+  Label, LabelInitiated, LabelEnded,
+  MiddleHeaderView, MainHeaderView,
   NameText,
   OuterStatusView,
-  RightView,
   StartTimeView, StartTime,
-  TagView, TitleView, TaskIcon, TitleIcon,
-  TitleText, TitleTextModal, TitleBorderView, TaskAttributesView,
-  ToText, ToWorkerView,
-  UnreadMessageCountText, UserImage, UserImageBackground,
+  TopHeaderView, TagView, TitleView, TaskIcon, TitleIcon,
+  TitleText, TaskAttributesView,
+  UserView, UnreadMessageCountText, UserImage, UserImageBackground,
 } from './styles';
 import { updateTasks } from '~/store/modules/task/actions';
 import api from '~/services/api';
@@ -145,7 +142,6 @@ const formattedDateTime = fdate =>
   }
 
   function handleMessage() {
-    setToggleTask(!toggleTask)
     navigation.navigate('MessagesConversationPage', {
       id: data.id,
       user_id: data.user.id,
@@ -160,7 +156,6 @@ const formattedDateTime = fdate =>
   }
 
   function handleEditTask() {
-    setToggleTask(!toggleTask)
     navigation.navigate('TaskEdit', {
       id: data.id,
       name: data.name,
@@ -186,7 +181,7 @@ const formattedDateTime = fdate =>
   }
 
   function handleScoreTask() {
-    setToggleTask(!toggleTask)
+
   }
 
   const hasUnread = (array) => {
@@ -204,164 +199,128 @@ const formattedDateTime = fdate =>
   }
   // -----------------------------------------------------------------------------
   return (
-    <Container
-      taskConditionIndex={taskConditionIndex}
-      onPress={handleToggleTask}
-      >
-      <LeftView>
-        { workerData === undefined || workerData.avatar === null
-          ? (
-            <UserImage/>
-            // <SenderText>Hi</SenderText>
-          )
-          : (
-            <UserImageBackground>
-              <UserImage source={{ uri: workerData.avatar.url }}/>
-            </UserImageBackground>
-          )
-        }
-      </LeftView>
-
-      <BodyView>
-        <BodyWrapper>
-          <ToWorkerView>
-            <TitleIcon name="eye"/>
-            <ToText numberOfLines={1}>{data.user.user_name}</ToText>
-            <TitleIcon name="briefcase"/>
-            <NameText numberOfLines={1}>{data.worker.worker_name}</NameText>
-          </ToWorkerView>
+    <Container taskConditionIndex={taskConditionIndex} toggleTask={toggleTask}>
+      <TouchableOpacity onPress={handleToggleTask}>
+        <TopHeaderView taskConditionIndex={taskConditionIndex} toggleTask={toggleTask}>
           <TitleView>
-            <TitleText numberOfLines={2}>{data.name}</TitleText>
+            <TitleIcon name="clipboard" pastDueDate={pastDueDate()} toggleTask={toggleTask}/>
+            <TitleText pastDueDate={pastDueDate() } toggleTask={toggleTask}>{data.name}</TitleText>
           </TitleView>
+        </TopHeaderView>
 
-          <DatesAndButtonView>
-            <TagView>
-              { data.initiated_at
+        <HeaderView>
+          <MainHeaderView>
+            <MiddleHeaderView>
+              <UserView>
+                <Label>De:</Label>
+                { workerData === undefined || workerData.avatar === null
+                  ? (
+                    <UserImage/>
+                    // <SenderText>Hi</SenderText>
+                  )
+                  : (
+                    <UserImageBackground>
+                      <UserImage source={{ uri: workerData.avatar.url }}/>
+                    </UserImageBackground>
+                  )
+                }
+                <NameText>{data.worker.worker_name}</NameText>
+              </UserView>
+
+              <AlignDatesView>
+
+                <DatesAndButtonView>
+                  <TagView>
+                    <Label>Prioridade:</Label>
+                    <TaskAttributesView taskAttributes={data.task_attributes[0]-1}>
+                      <DueTime>{taskAttributesArray[JSON.stringify(data.task_attributes[0]-1)]}</DueTime>
+                    </TaskAttributesView>
+                  </TagView>
+                  <TagView>
+                    <Label>Urgência:</Label>
+                    <TaskAttributesView taskAttributes={data.task_attributes[1]-1}>
+                      <DueTime>{taskAttributesArray[data.task_attributes[1]-1]}</DueTime>
+                    </TaskAttributesView>
+                  </TagView>
+                </DatesAndButtonView>
+              </AlignDatesView>
+            </MiddleHeaderView>
+
+            <BottomHeaderView>
+              <OuterStatusView>
+                <InnerStatusView
+                  statusResult={statusResult}
+                  colors={['#ffdd33', '#ff892e']}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  style={{ width: `${statusResult}%`}}
+                ></InnerStatusView>
+              </OuterStatusView>
+              <StartTime>{statusResult}%</StartTime>
+            </BottomHeaderView>
+          </MainHeaderView>
+
+          <AsideView>
+            {/* <AlignView> */}
+              { (hasUnread(data.sub_task_list) === 0)
                 ? (
-                  <LabelInitiated>Started</LabelInitiated>
+                  null
                 )
                 : (
-                  <Label>Sent</Label>
+                  <BellIcon name="bell">
+                    <UnreadMessageCountText>{hasUnread(data.sub_task_list)}</UnreadMessageCountText>
+                  </BellIcon>
                 )
               }
-            </TagView>
-            <TagView>
-              { data.end_date
+              { (hasUnread(messageBell) === 0)
                 ? (
-                  <>
-                    <LabelEnded pastDueDate={pastDueDate()}>Ended:</LabelEnded>
-                    <DueTimeView pastDueDate={endPastDueDate()}>
-                      <DueTime>{formattedDate(data.end_date)}</DueTime>
-                    </DueTimeView>
-                  </>
+                  null
                 )
                 : (
-                  <>
-                    <Label>Due:</Label>
-                    <DueTimeView pastDueDate={pastDueDate()}>
-                      <DueTime>{formattedDate(data.due_date)}</DueTime>
-                    </DueTimeView>
-                  </>
+                  <BellIcon name="message-circle">
+                    <UnreadMessageCountText>{hasUnread(messageBell)}</UnreadMessageCountText>
+                  </BellIcon>
                 )
               }
-            </TagView>
-          </DatesAndButtonView>
-          <BottomHeaderView>
-            <OuterStatusView>
-              <InnerStatusView
-                statusResult={statusResult}
-                colors={['#ffdd33', '#ff892e']}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                style={{ width: `${statusResult}%`}}
-              ></InnerStatusView>
-            </OuterStatusView>
-            <StartTime>{statusResult}%</StartTime>
-          </BottomHeaderView>
-        </BodyWrapper>
-      </BodyView>
-      <RightView>
-        { (hasUnread(data.sub_task_list) === 0)
-          ? (
-            null
-          )
-          : (
-            <BellIcon name="bell">
-              <UnreadMessageCountText>{hasUnread(data.sub_task_list)}</UnreadMessageCountText>
-            </BellIcon>
-          )
-        }
-        { (hasUnread(messageBell) === 0)
-          ? (
-            null
-          )
-          : (
-            <BellIcon name="message-square">
-              <UnreadMessageCountText>{hasUnread(messageBell)}</UnreadMessageCountText>
-            </BellIcon>
-          )
-        }
-      </RightView>
-{/* ------------------------------------------------------------------------ */}
-      <Modal isVisible={toggleTask}>
-      <ModalView>
-        <CenterView>
-
-          <TitleBorderView>
-            <TitleIcon name="clipboard"/>
-            <TitleTextModal>{data.name}</TitleTextModal>
-          </TitleBorderView>
-        </CenterView>
-        {/* <HrLine/> */}
-
-        <DescriptionView>
-          <Label>Sub-items</Label>
-          <DescriptionBorderView>
-            { data.sub_task_list.map((s, index) => (
-              <AlignCheckBoxView key={index}>
-                <CheckBoxView>
-                    <CheckBox
-                      disabled={false}
-                      value={s.complete}
-                      onValueChange={
-                        (newValue) => handletoggleCheckBox(newValue, index)
-                      }
-                      disabled={true}
-                    />
-                    <DescriptionSpan>{s.weige_percentage}%</DescriptionSpan>
-                    <DescriptionSpan type="check-box">{s.description}</DescriptionSpan>
-                </CheckBoxView>
-              </AlignCheckBoxView>
-            ))}
-          </DescriptionBorderView>
-        </DescriptionView>
+            {/* </AlignView> */}
+          </AsideView>
+        </HeaderView>
+      </TouchableOpacity>
+      { toggleTask && (
+        <>
+          <DescriptionView>
+            {/* ------------------------------------------------------------ */}
+            <HrLine/>
+            <Label>Descrição</Label>
+            <DescriptionBorderView pastDueDate={pastDueDate()}>
+              <DescriptionSpan>{data.description}</DescriptionSpan>
+            </DescriptionBorderView>
+          </DescriptionView>
+          <DescriptionView>
+            <Label>Sub-tarefas</Label>
+            <DescriptionBorderView pastDueDate={pastDueDate()}>
+              { data.sub_task_list.map((s, index) => (
+                <AlignCheckBoxView key={index}>
+                  <CheckBoxView>
+                      <CheckBox
+                        disabled={false}
+                        value={s.complete}
+                        onValueChange={
+                          (newValue) => handletoggleCheckBox(newValue, index)
+                        }
+                        disabled={true}
+                      />
+                      <DescriptionSpan>{s.weige_percentage}%</DescriptionSpan>
+                      <DescriptionSpan type="check-box">{s.description}</DescriptionSpan>
+                  </CheckBoxView>
+                </AlignCheckBoxView>
+              ))}
+            </DescriptionBorderView>
+          </DescriptionView>
 
           <AlignDetailsView>
             <DetailsView>
               <TagView>
-                <Label>Start Date:</Label>
-                { data.initiated_at
-                  ? (
-                    <>
-
-                      <StartTimeView>
-                        <StartTime>{formattedDate(data.initiated_at)}</StartTime>
-                      </StartTimeView>
-                    </>
-                  )
-                  : (
-                    <>
-
-                      <StartTimeView initiated={data.initiated_at}>
-                        <StartTime>{formattedDate(data.start_date)}</StartTime>
-                      </StartTimeView>
-                    </>
-                  )
-                }
-              </TagView>
-            </DetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Due Date & Time:</Label>
+                <Label>Prazo com horário:</Label>
                 { data.end_date !== null
                   ? (
                     <DueTimeView style={{backgroundColor:'#f5f5f5'}}>
@@ -390,23 +349,7 @@ const formattedDateTime = fdate =>
             }
             <DetailsView>
               <TagView>
-                <Label>Priority:</Label>
-                <TaskAttributesView taskAttributes={data.task_attributes[0]-1}>
-                  <DueTime>{taskAttributesArray[JSON.stringify(data.task_attributes[0]-1)]}</DueTime>
-                </TaskAttributesView>
-              </TagView>
-            </DetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Urgency:</Label>
-                <TaskAttributesView taskAttributes={data.task_attributes[1]-1}>
-                  <DueTime>{taskAttributesArray[data.task_attributes[1]-1]}</DueTime>
-                </TaskAttributesView>
-              </TagView>
-            </DetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Complexity:</Label>
+                <Label>Complexidade:</Label>
                 <TaskAttributesView taskAttributes={data.task_attributes[1]-1}>
                   <DueTime>{taskAttributesArray[data.task_attributes[1]-1]}</DueTime>
                 </TaskAttributesView>
@@ -415,29 +358,26 @@ const formattedDateTime = fdate =>
 
             <DetailsView>
               <TagView>
-                <Label>Confirmation with photograph?</Label>
-                <ToText>Sim</ToText>
+                <Label>Confirmação com foto?</Label>
+                <NameText>Sim</NameText>
               </TagView>
             </DetailsView>
           </AlignDetailsView>
+          {/* -------------------------------------------------------------- */}
+          <HrLine/>
 
-
-          <DescriptionView>
-            {/* <HrLine/> */}
-            <Label>Obs.</Label>
-            <DescriptionBorderView pastDueDate={pastDueDate()}>
-              <DescriptionSpan>{data.description}</DescriptionSpan>
-            </DescriptionBorderView>
-          </DescriptionView>
-
-          <IconsView>
+          <DatesAndButtonView>
             <ButtonView onPress={handleMessage}>
-              <TaskIcon name="message-circle"/>
+              <ConfirmButton>
+                <TaskIcon name="message-circle"/>
+              </ConfirmButton>
             </ButtonView>
             { taskConditionIndex === 1
               ? (
                 <ButtonView onPress={handleEditTask}>
-                  <TaskIcon name="edit"/>
+                  <ConfirmButton>
+                    <TaskIcon name="edit"/>
+                  </ConfirmButton>
                 </ButtonView>
               )
               : (
@@ -447,7 +387,9 @@ const formattedDateTime = fdate =>
             { taskConditionIndex === 2
               ? (
                 <ButtonView onPress={handleScoreTask}>
-                  <TaskIcon name="meh"/>
+                  <ConfirmButton>
+                    <TaskIcon name="meh"/>
+                  </ConfirmButton>
                 </ButtonView>
               )
               : (
@@ -457,7 +399,9 @@ const formattedDateTime = fdate =>
             { taskConditionIndex === 3
               ? (
                 <ButtonView onPress={handleReviveTask}>
-                  <TaskIcon name="activity"/>
+                  <ConfirmButton>
+                    <TaskIcon name="activity"/>
+                  </ConfirmButton>
                 </ButtonView>
               )
               : (
@@ -467,7 +411,9 @@ const formattedDateTime = fdate =>
             { taskConditionIndex === 1
               ? (
                 <ButtonView onPress={handleCancelTask}>
-                  <TaskIcon name="trash-2"/>
+                  <ConfirmButton>
+                    <TaskIcon name="trash-2"/>
+                  </ConfirmButton>
                 </ButtonView>
               )
               : (
@@ -477,32 +423,29 @@ const formattedDateTime = fdate =>
             { taskConditionIndex === 3
               ? (
                 <ButtonView>
-                  <TaskIcon
-                    name="trash-2"
-                    style={{color: '#ccc'}}
-                  />
+                  <ConfirmButton>
+                    <TaskIcon
+                      name="trash-2"
+                      style={{color: '#ccc'}}
+                    />
+                  </ConfirmButton>
                 </ButtonView>
               )
               : (
                 null
               )
             }
-          </IconsView>
-          <DescriptionView>
-            <BackButton onPress={handleToggleTask}>
-              <ButtonText>Back</ButtonText>
-            </BackButton>
-          </DescriptionView>
+          </DatesAndButtonView>
           { data.signature &&
             <ImageWrapper>
-              <Label>Confirmation Photo:</Label>
+              <Label>Foto de confirmação:</Label>
               <ImageView>
                 <Image source={{ uri: data.signature.url }}/>
               </ImageView>
             </ImageWrapper>
           }
-        </ModalView>
-      </Modal>
+        </>
+      )}
     </Container>
   );
 }

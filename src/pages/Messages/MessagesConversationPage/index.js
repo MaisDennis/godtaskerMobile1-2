@@ -12,7 +12,7 @@ import {
   BodyView,
   Container, ConversationView,
   ForwardText, ForwardOnTopView,
-  Header, HrLine,
+  Header, HrDivider, HrLine,
   Image, ImageBackgroundView,
   LineView,
   MessageView, MessageText, MessageContainer,
@@ -359,8 +359,8 @@ export default function MessagesConversationPage({ navigation, route }) {
                 )
               }
             <SenderView>
-              <SenderText>{route.params.user_name}</SenderText>
-              <SenderAboutText>
+              <SenderText numberOfLines={1}>{route.params.user_name}</SenderText>
+              <SenderAboutText numberOfLines={1}>
                 { route.params.bio
                   ? route.params.bio
                   : 'Seja a mudança que queira nesse mundo! Lorem Ipsum Lorem Ipsum Lorem Ipsum'
@@ -369,8 +369,19 @@ export default function MessagesConversationPage({ navigation, route }) {
             </SenderView>
           </BodyView>
         </Header>
-
-        <ReplyContainer>
+        <HrDivider/>
+        <ConversationView>
+          <FlatList
+            data={messages}
+            renderItem={renderItem}
+            keyExtractor={item => String(item.id)}
+            ref={lastMessageRef}
+            // initialScrollIndex={2}
+            // getItemLayout={(data, index) => (
+            //   {length: 50, offset: 50 * index, index, animation: false}
+            // )}
+          />
+          <ReplyContainer>
             { replyValue && (
               <TemporaryMessageContainer>
                 <TemporaryMessageView>
@@ -384,6 +395,7 @@ export default function MessagesConversationPage({ navigation, route }) {
                 </TemporaryMessageIconView>
               </TemporaryMessageContainer>
             )}
+            <HrDivider/>
             <ReplyView>
               <SendInput
                   keyboardType="default"
@@ -411,19 +423,8 @@ export default function MessagesConversationPage({ navigation, route }) {
               }
             </ReplyView>
           </ReplyContainer>
-
-        <ConversationView>
-          <FlatList
-            data={messages}
-            renderItem={renderItem}
-            keyExtractor={item => String(item.id)}
-            ref={lastMessageRef}
-            // initialScrollIndex={2}
-            // getItemLayout={(data, index) => (
-            //   {length: 50, offset: 50 * index, index, animation: false}
-            // )}
-          />
         </ConversationView>
+
         {/* <ParsedKeyboardAvoidingView
           // keyboardVerticalOffset={10}
           // behavior={Platform.OS === "ios" ? "padding" : "height"}

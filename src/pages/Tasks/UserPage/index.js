@@ -6,14 +6,15 @@ import pt from 'date-fns/locale/pt';
 // -----------------------------------------------------------------------------
 import TaskUser from '~/components/TasksUser';
 import HeaderView from '~/components/HeaderView'
-import godtaskerFont from '~/assets/detective/godtaskerFontPlainGreySmall.png';
+// import godtaskerFont from '~/assets/detective/godtaskerFontPlainGreySmall.png';
+import logo from '~/assets/detective/detective_remake.png'
 import api from '~/services/api';
 import {
   AddIcon,
   Container,
   List,
   Header, HeaderImage, HeaderTabView, HeaderTouchable,
-  SpaceView,
+  SpaceView, SearchBarTextInput,
   Title, TitleNumber,
   UpperTabView, UpperTabText,
 } from './styles';
@@ -75,28 +76,30 @@ export default function UserPage({ navigation }) {
       <Header>
         <SpaceView>
           <HeaderImage
-            source={godtaskerFont}
+            source={logo}
           />
         </SpaceView>
 
-        <HeaderView data={todayDate}/>
+        <SearchBarTextInput
+          placeholder='Search'
+        />
         <HeaderTouchable onPress={() => loadTasks('', user_id)}>
-          <AddIcon name='refresh-cw' size={21}/>
+          <AddIcon name='refresh-cw' size={20}/>
         </HeaderTouchable>
         <HeaderTouchable onPress={handleCreateTaskPage}>
-          <AddIcon name='plus' size={21}/>
+          <AddIcon name='plus-square' size={21}/>
         </HeaderTouchable>
       </Header>
 
       <HeaderTabView>
         <UpperTabView onPress={() => loadTasks('', user_id)}>
-            <UpperTabText>em aberto</UpperTabText>
+            <UpperTabText>open</UpperTabText>
         </UpperTabView>
         <UpperTabView onPress={() => loadFinished('', user_id)}>
-          <UpperTabText>finalizadas</UpperTabText>
+          <UpperTabText>finished</UpperTabText>
         </UpperTabView>
         <UpperTabView onPress={() => loadCanceled('', user_id)}>
-          <UpperTabText>canceladas</UpperTabText>
+          <UpperTabText>canceled</UpperTabText>
         </UpperTabView>
       </HeaderTabView>
       { tasks == ''
@@ -109,8 +112,13 @@ export default function UserPage({ navigation }) {
             keyExtractor={item => String(item.id)}
             renderItem={({ item, index }) => (
               <>
-                <TitleNumber>{index+1}</TitleNumber>
-                <TaskUser key={item.id} data={item} navigation={navigation} taskConditionIndex={taskConditionIndex}/>
+                {/* <TitleNumber>{index+1}</TitleNumber> */}
+                <TaskUser
+                  key={item.id}
+                  data={item}
+                  navigation={navigation}
+                  taskConditionIndex={taskConditionIndex}
+                />
               </>
             )}
           />

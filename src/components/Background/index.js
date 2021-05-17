@@ -2,13 +2,13 @@
 import styled from 'styled-components/native';
 // -----------------------------------------------------------------------------
 // export default styled(LinearGradient).attrs({
-//   colors: ['#222', '#222'],
+//   colors: ['#fff', '#334466'],
 // })`
 //   flex: 1;
 // `;
 
 export default styled.View`
-  background-color: #222;
+  background-color: #fff;
   height: 100%;
   flex: 1;
 `;

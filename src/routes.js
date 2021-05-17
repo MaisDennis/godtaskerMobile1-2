@@ -8,15 +8,18 @@ import Confirm from './pages/Confirm';
 import ContactCreate from './pages/Contacts/ContactCreatePage';
 import ContactEdit from './pages/Contacts/ContactEditPage';
 import ContactTasks from './pages/Contacts/ContactTasksPage';
+import Follow from './pages/Contacts/FollowPage';
+import WorkerPage from './pages/WorkerPage';
 
 import MessagesConversationPage from './pages/Messages/MessagesConversationPage/index';
 
+import Settings from '~/pages/Settings';
 import SignInPhone from './pages/SignInPhone';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 
 import TabRoutes from '~/components/TabRoutes';
-import TestPage from './pages/TestPage';
+// import TestPage from './pages/TestPage';
 import TaskCreate from './pages/Tasks/TaskCreatePage';
 import TaskEdit from './pages/Tasks/TaskEditPage';
 
@@ -58,14 +61,14 @@ export default function App() {
       />
       <Stack.Screen name="SignUp" component={SignUp}
         options={{
-          headerTitle: (() => (<HeaderView data={'Criar um usuário'}/>)),
+          headerTitle: (() => (<HeaderView data={'Sign Up'}/>)),
           headerShown: true,
           headerStyle: {
             height: headerHeight,
-            backgroundColor: '#f5f5f5',
+            backgroundColor: '#fff',
           },
           headerBackTitleVisible: headerBackVisible,
-          headerBackTitle: "Voltar",
+          headerBackTitle: "Back",
           headerBackTitleStyle: {
             fontSize: headerBackFontSize,
             marginLeft: 8,
@@ -73,12 +76,12 @@ export default function App() {
           },
         }}
       />
-      <Stack.Screen name="TestPage" component={TestPage}
+      {/* <Stack.Screen name="TestPage" component={TestPage}
         options={{
           title: 'Entrar',
           headerShown: false,
         }}
-      />
+      /> */}
       <Stack.Screen
         name="Home"
         component={TabRoutes}
@@ -90,14 +93,14 @@ export default function App() {
         name="TaskCreate"
         component={TaskCreate}
         options={{
-          headerTitle: (() => (<HeaderView data={'Criar uma tarefa'}/>)),
+          headerTitle: (() => (<HeaderView data={'Create Task'}/>)),
           headerShown: true,
           headerStyle: {
             height: headerHeight,
-            backgroundColor: '#f5f5f5',
+            backgroundColor: '#fff',
           },
           headerBackTitleVisible: headerBackVisible,
-          headerBackTitle: "Voltar",
+          headerBackTitle: "Back",
           headerBackTitleStyle: {
             fontSize: headerBackFontSize,
             marginLeft: 8,
@@ -109,14 +112,14 @@ export default function App() {
         name="TaskEdit"
         component={TaskEdit}
         options={{
-          headerTitle: (() => (<HeaderView data={'Editar a tarefa'}/>)),
+          headerTitle: (() => (<HeaderView data={'Edit Task'}/>)),
           headerShown: true,
           headerStyle: {
             height: headerHeight,
-            backgroundColor: '#f5f5f5',
+            backgroundColor: '#fff',
           },
           headerBackTitleVisible: headerBackVisible,
-          headerBackTitle: "Voltar",
+          headerBackTitle: "Back",
           headerBackTitleStyle: {
             fontSize: headerBackFontSize,
             marginLeft: 8,
@@ -128,14 +131,71 @@ export default function App() {
         name="Confirm"
         component={Confirm}
         options={{
-          headerTitle: (() => (<HeaderView data={'Finalizar a tarefa'}/>)),
+          headerTitle: (() => (<HeaderView data={'Confirm Task'}/>)),
           headerShown: true,
           headerStyle: {
             height: headerHeight,
-            backgroundColor: '#f5f5f5',
+            backgroundColor: '#fff',
           },
           headerBackTitleVisible: headerBackVisible,
-          headerBackTitle: "Voltar",
+          headerBackTitle: "Back",
+          headerBackTitleStyle: {
+            fontSize: headerBackFontSize,
+            marginLeft: 8,
+            color: '#4433ee',
+          },
+        }}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          headerTitle: (() => (<HeaderView data={'Settings'}/>)),
+          headerShown: true,
+          headerStyle: {
+            height: headerHeight,
+            backgroundColor: '#fff',
+          },
+          headerBackTitleVisible: headerBackVisible,
+          headerBackTitle: "Back",
+          headerBackTitleStyle: {
+            fontSize: headerBackFontSize,
+            marginLeft: 8,
+            color: '#4433ee',
+          },
+        }}
+      />
+      <Stack.Screen
+        name="Follow"
+        component={Follow}
+        options={{
+          headerTitle: (() => (<HeaderView data={'Followers'}/>)),
+          headerShown: true,
+          headerStyle: {
+            height: headerHeight,
+            backgroundColor: '#fff',
+          },
+          headerBackTitleVisible: headerBackVisible,
+          headerBackTitle: "Back",
+          headerBackTitleStyle: {
+            fontSize: headerBackFontSize,
+            marginLeft: 8,
+            color: '#4433ee',
+          },
+        }}
+      />
+      <Stack.Screen
+        name="WorkerPage"
+        component={WorkerPage}
+        options={{
+          headerTitle: (() => (<HeaderView data={'WorkerPage'}/>)),
+          headerShown: true,
+          headerStyle: {
+            height: headerHeight,
+            backgroundColor: '#fff',
+          },
+          headerBackTitleVisible: headerBackVisible,
+          headerBackTitle: "Back",
           headerBackTitleStyle: {
             fontSize: headerBackFontSize,
             marginLeft: 8,
@@ -151,10 +211,10 @@ export default function App() {
             headerShown: true,
             headerStyle: {
               height: headerHeight,
-              backgroundColor: '#f5f5f5',
+              backgroundColor: '#fff',
             },
             headerBackTitleVisible: headerBackVisible,
-            headerBackTitle: "Voltar",
+            headerBackTitle: "Back",
             headerBackTitleStyle: {
               fontSize: headerBackFontSize,
               marginLeft: 8,
@@ -170,10 +230,10 @@ export default function App() {
           headerShown: true,
           headerStyle: {
             height: headerHeight,
-            backgroundColor: '#f5f5f5',
+            backgroundColor: '#fff',
           },
           headerBackTitleVisible: headerBackVisible,
-          headerBackTitle: "Voltar",
+          headerBackTitle: "Back",
           headerBackTitleStyle: {
             fontSize: headerBackFontSize,
             marginLeft: 8,
@@ -189,10 +249,10 @@ export default function App() {
           headerShown: true,
           headerStyle: {
             height: headerHeight,
-            backgroundColor: '#f5f5f5',
+            backgroundColor: '#fff',
           },
           headerBackTitleVisible: headerBackVisible,
-          headerBackTitle: "Voltar",
+          headerBackTitle: "Back",
           headerBackTitleStyle: {
             fontSize: headerBackFontSize,
             marginLeft: 8,
@@ -204,14 +264,14 @@ export default function App() {
         name="MessagesConversationPage"
         component={MessagesConversationPage}
         options={{
-          headerTitle: (() => (<HeaderView data={'Mensagens'}/>)),
+          headerTitle: (() => (<HeaderView data={'Chat'}/>)),
           headerShown: true,
           headerStyle: {
             height: headerHeight,
-            backgroundColor: '#f5f5f5',
+            backgroundColor: '#fff',
           },
           headerBackTitleVisible: headerBackVisible,
-          headerBackTitle: "Voltar",
+          headerBackTitle: "Back",
           headerBackTitleStyle: {
             fontSize: headerBackFontSize,
             marginLeft: 8,
@@ -223,14 +283,14 @@ export default function App() {
         name="UpdateProfile"
         component={UpdateProfile}
         options={{
-          headerTitle: (() => (<HeaderView data={'Editar o perfil'}/>)),
+          headerTitle: (() => (<HeaderView data={'Edit Profile'}/>)),
           headerShown: true,
           headerStyle: {
             height: headerHeight,
-            backgroundColor: '#f5f5f5',
+            backgroundColor: '#fff',
           },
           headerBackTitleVisible: headerBackVisible,
-          headerBackTitle: "Voltar",
+          headerBackTitle: "Back",
           headerBackTitleStyle: {
             fontSize: headerBackFontSize,
             marginLeft: 8,

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState, useMemo } from 'react';
-import { ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
+import { Alert, TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { format, parseISO } from 'date-fns';
 import CheckBox from '@react-native-community/checkbox';
@@ -15,28 +15,22 @@ import {
   AsideView, AlignBottomView, AlignView,
   AlignDatesView, AlignDetailsView, AlignCheckBoxView,
   AcceptButton, AcceptButtonView,
-  BackButton,
-  BodyView, BodyWrapper,
   ButtonView, ButtonText, BottomHeaderView,
   BellIcon, ButtonIcon, ButtonWrapper,
-  CenterView,
-  ConfirmButton, ConfirmIcon, CheckBoxView, Container,
+  ConfirmButton, CheckBoxView, Container,
   CameraButton,
   DescriptionView, DescriptionBorderView, DescriptionSpan,
   DatesAndButtonView, DueTimeView, DueTime, DetailsView,
-  FormScrollView,
   HeaderView, HrLine,
-  IconsView,
   Image, ImageView, ImageWrapper, InnerStatusView,
-  Label, LabelInitiated, LabelEnded, LeftView,
+  Label, LabelInitiated, LabelEnded,
   ModalView, ModalText, MessageButton, MiddleHeaderView, MainHeaderView,
   NameText,
   OuterStatusView,
-  RejectTaskInput, RejectButton, RightView,
+  RejectTaskInput, RejectButton,
   StartTimeView, StartTime,
   TopHeaderView, TagView, TitleView, TaskIcon,
-  TitleText, TaskAttributesView, ToWorkerView, ToText, TitleIcon,
-  TitleBorderView, TitleTextModal,
+  TitleText, TaskAttributesView,
   UnreadMessageCountText, UserView, UserImage, UserImageBackground,
 } from './styles';
 import { updateTasks } from '~/store/modules/task/actions';
@@ -71,7 +65,6 @@ export default function Task({ data, navigation, taskConditionIndex }) {
   const [updateStatus, setUpdateStatus] = useState();
   const [messageBell, setMessageBell] = useState();
   const[statusResult, setStatusResult] = useState(0);
-  const [ sendingIndicator, setSendingIndicator ] = useState();
 
   useEffect (() => {
     handleMessageBell()
@@ -232,8 +225,6 @@ export default function Task({ data, navigation, taskConditionIndex }) {
   }
 
   async function takePhotoFromCamera() {
-    setTogglePhotoModal(!togglePhotoModal)
-    setToggleTask(!toggleTask)
     ImagePicker.openCamera({
       width: 300,
       height: 400,
@@ -250,7 +241,6 @@ export default function Task({ data, navigation, taskConditionIndex }) {
       });
 
       try {
-        setSendingIndicator(!sendingIndicator)
         const response = await api.post('signatures', formData);
 
         const { signature_id } = response.data;
@@ -258,32 +248,36 @@ export default function Task({ data, navigation, taskConditionIndex }) {
         await api.put(`tasks/confirm/${task_id}`, {
           signature_id,
         });
-        setSendingIndicator(!sendingIndicator)
         Alert.alert(
-          'Success!',
-          'Photo sent!',
+          'Confirmação',
+          'Enviada com sucesso!',
           [
             {
               text: 'OK',
-              // onPress: () => console.log('OKBJ')
-            }
-          ],
-          {cancelable: false }
-        )
-      }
-      catch {
-        Alert.alert(
-          'Error: Not able to send photo',
-          'Please try again',
-          [
-            {
-              text: 'OK',
-              // onPress: () => console.log('OKBJ')
+              onPress: () => console.log('OKBJ')
             }
           ],
           {cancelable: false }
         )
         setTogglePhotoModal(!togglePhotoModal)
+
+
+      }
+      catch {
+        Alert.alert(
+          'Confirmação',
+          'Não foi possível enviar a confirmação.',
+          [
+            {
+              text: 'OK',
+              onPress: () => console.log('OKBJ')
+            }
+          ],
+          {cancelable: false }
+        )
+        setTogglePhotoModal(!togglePhotoModal)
+
+
       }
     })
   }
@@ -307,7 +301,6 @@ export default function Task({ data, navigation, taskConditionIndex }) {
         });
 
         try {
-          setSendingIndicator(!sendingIndicator)
           const response = await api.post('signatures', formData);
 
           const { signature_id } = response.data;
@@ -315,10 +308,9 @@ export default function Task({ data, navigation, taskConditionIndex }) {
           await api.put(`tasks/confirm/${task_id}`, {
             signature_id,
           });
-          setSendingIndicator(!sendingIndicator)
           Alert.alert(
-            'Success!',
-            'Photo sent!',
+            'Confirmação',
+            'Enviada com sucesso!',
             [
               {
                 text: 'OK',
@@ -332,12 +324,12 @@ export default function Task({ data, navigation, taskConditionIndex }) {
         }
         catch {
           Alert.alert(
-            'Error: Not able to send photo',
-            'Please try again',
+            'Confirmação',
+            'Não foi possível enviar a confirmação.',
             [
               {
                 text: 'OK',
-                // onPress: () => console.log('OKBJ')
+                onPress: () => console.log('OKBJ')
               }
             ],
             {cancelable: false }
@@ -349,168 +341,170 @@ export default function Task({ data, navigation, taskConditionIndex }) {
     }
   // -----------------------------------------------------------------------------
   return (
-    <Container
-      taskConditionIndex={taskConditionIndex}
-      onPress={handleToggleTask}
-    >
-      <LeftView>
-        { userData === undefined || userData.avatar === null
-          ? (
-            <UserImage/>
-            // <SenderText>Hi</SenderText>
-          )
-          : (
-            <UserImageBackground>
-              <UserImage source={{ uri: userData.avatar.url }}/>
-            </UserImageBackground>
-          )
-        }
-      </LeftView>
-
-      <BodyView>
-        <BodyWrapper>
-          <ToWorkerView>
-            <TitleIcon name="eye"/>
-            <ToText numberOfLines={1}>{data.user.user_name}</ToText>
-            <TitleIcon name="briefcase"/>
-            <NameText numberOfLines={1}>{data.worker.worker_name}</NameText>
-          </ToWorkerView>
+    <Container taskConditionIndex={taskConditionIndex}>
+      <TouchableOpacity onPress={handleToggleTask}>
+        <TopHeaderView taskConditionIndex={taskConditionIndex} toggleTask={toggleTask}>
           <TitleView>
-            <TitleText numberOfLines={2}>{data.name}</TitleText>
+            <TaskIcon name="clipboard" pastDueDate={pastDueDate()} toggleTask={toggleTask}/>
+            <TitleText pastDueDate={pastDueDate()} toggleTask={toggleTask}>{data.name}</TitleText>
           </TitleView>
+        </TopHeaderView>
 
-          <DatesAndButtonView>
-            <TagView>
-              { data.initiated_at
-                ? (
-                  <LabelInitiated>Started</LabelInitiated>
-                )
-                : (
-                  <Label>Received</Label>
-                )
-              }
-            </TagView>
-            <TagView>
-              { data.end_date
-                ? (
-                  <>
-                    <LabelEnded pastDueDate={pastDueDate()}>Ended:</LabelEnded>
-                    <DueTimeView pastDueDate={endPastDueDate()}>
-                      <DueTime>{formattedDate(data.end_date)}</DueTime>
-                    </DueTimeView>
-                  </>
-                )
-                : (
-                  <>
-                    <Label>Due:</Label>
-                    <DueTimeView pastDueDate={pastDueDate()}>
-                      <DueTime>{formattedDate(data.due_date)}</DueTime>
-                    </DueTimeView>
-                  </>
-                )
-              }
-            </TagView>
-          </DatesAndButtonView>
-          <BottomHeaderView>
-            <OuterStatusView>
-              <InnerStatusView
-                statusResult={statusResult}
-                colors={['#ffdd33', '#ff892e']}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                style={{ width: `${statusResult}%`}}
-              ></InnerStatusView>
-            </OuterStatusView>
-            <StartTime>{statusResult}%</StartTime>
-          </BottomHeaderView>
-        </BodyWrapper>
-      </BodyView>
-
-      <RightView>
-        { (hasUnread(data.sub_task_list) === 0)
-          ? (
-            null
-          )
-          : (
-            <BellIcon name="bell">
-              <UnreadMessageCountText>{hasUnread(data.sub_task_list)}</UnreadMessageCountText>
-            </BellIcon>
-          )
-        }
-        { (hasUnread(messageBell) === 0)
-          ? (
-            null
-          )
-          : (
-            <BellIcon name="message-circle">
-              <UnreadMessageCountText>{hasUnread(messageBell)}</UnreadMessageCountText>
-            </BellIcon>
-          )
-        }
-      </RightView>
-{/* ------------------------------------------------------------------------ */}
-      <Modal isVisible={toggleTask}>
-
-        <ModalView>
-        <FormScrollView
-          // contentContainerStyle={styles.alignItems}
-        >
-          <CenterView>
-
-            <TitleBorderView>
-              <TitleIcon name="clipboard"/>
-              <TitleTextModal>{data.name}</TitleTextModal>
-            </TitleBorderView>
-          </CenterView>
-
-          <DescriptionView>
-          <Label>Sub-items</Label>
-          <DescriptionBorderView pastDueDate={pastDueDate()}>
-            { data.sub_task_list.map((s, index) => (
-              <AlignCheckBoxView key={index}>
-                <CheckBoxView>
-                    <CheckBox
-                      disabled={false}
-                      value={s.complete}
-                      onValueChange={
-                        (newValue) => handletoggleCheckBox(newValue, index)
-                      }
-                      disabled={true}
-                    />
-                    <DescriptionSpan>{s.weige_percentage}%</DescriptionSpan>
-                    <DescriptionSpan type="check-box">{s.description}</DescriptionSpan>
-                </CheckBoxView>
-              </AlignCheckBoxView>
-            ))}
-          </DescriptionBorderView>
-        </DescriptionView>
-
-        <AlignDetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Start Date:</Label>
-                { data.initiated_at
+        <HeaderView>
+          <MainHeaderView>
+            <MiddleHeaderView>
+              <UserView>
+                <Label>De:</Label>
+                { userData === undefined || userData.avatar === null
                   ? (
-                    <>
-
-                      <StartTimeView>
-                        <StartTime>{formattedDate(data.initiated_at)}</StartTime>
-                      </StartTimeView>
-                    </>
+                    <UserImage/>
+                    // <SenderText>Hi</SenderText>
                   )
                   : (
-                    <>
-
-                      <StartTimeView initiated={data.initiated_at}>
-                        <StartTime>{formattedDate(data.start_date)}</StartTime>
-                      </StartTimeView>
-                    </>
+                    <UserImageBackground>
+                      <UserImage source={{ uri: userData.avatar.url }}/>
+                    </UserImageBackground>
                   )
                 }
-              </TagView>
-            </DetailsView>
+                <NameText pastDueDate={pastDueDate()}>{data.user.user_name}</NameText>
+              </UserView>
+
+              <AlignDatesView>
+                <DatesAndButtonView>
+                  <TagView>
+                    { data.initiated_at
+                      ? (
+                        <>
+                          <LabelInitiated>Início:</LabelInitiated>
+                          <StartTimeView>
+                            <StartTime>{formattedDate(data.initiated_at)}</StartTime>
+                          </StartTimeView>
+                        </>
+                      )
+                      : (
+                        <>
+                          <Label>Início:</Label>
+                          <StartTimeView initiated={data.initiated_at}>
+                            <StartTime>{formattedDate(data.start_date)}</StartTime>
+                          </StartTimeView>
+                        </>
+                      )
+                    }
+                  </TagView>
+                  <TagView>
+                   { data.end_date
+                      ? (
+                        <>
+                          <LabelEnded pastDueDate={pastDueDate()}>Enc.</LabelEnded>
+                          <DueTimeView pastDueDate={endPastDueDate()}>
+                            <DueTime>{formattedDate(data.end_date)}</DueTime>
+                          </DueTimeView>
+                        </>
+                      )
+                      : (
+                        <>
+                          <Label>Prazo:</Label>
+                          <DueTimeView pastDueDate={pastDueDate()}>
+                            <DueTime>{formattedDate(data.due_date)}</DueTime>
+                          </DueTimeView>
+                        </>
+                      )
+                    }
+                  </TagView>
+                </DatesAndButtonView>
+                <DatesAndButtonView>
+                  <TagView>
+                    <Label>Prioridade:</Label>
+                    <TaskAttributesView taskAttributes={data.task_attributes[0]-1}>
+                      <DueTime>{taskAttributesArray[JSON.stringify(data.task_attributes[0]-1)]}</DueTime>
+                    </TaskAttributesView>
+                  </TagView>
+                  <TagView>
+                    <Label>Urgência:</Label>
+                    <TaskAttributesView taskAttributes={data.task_attributes[1]-1}>
+                      <DueTime>{taskAttributesArray[data.task_attributes[1]-1]}</DueTime>
+                    </TaskAttributesView>
+                  </TagView>
+                </DatesAndButtonView>
+              </AlignDatesView>
+            </MiddleHeaderView>
+
+            <BottomHeaderView>
+              <OuterStatusView>
+                <InnerStatusView
+                  statusResult={statusResult}
+                  colors={['#ffdd33', '#ff892e']}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  style={{ width: `${statusResult}%`}}
+                ></InnerStatusView>
+              </OuterStatusView>
+              <StartTime>{statusResult}%</StartTime>
+            </BottomHeaderView>
+          </MainHeaderView>
+
+          <AsideView>
+            {/* <AlignView> */}
+              { (hasUnread(data.sub_task_list) === 0)
+                ? (
+                  null
+                )
+                : (
+                  <BellIcon name="bell">
+                    <UnreadMessageCountText>{hasUnread(data.sub_task_list)}</UnreadMessageCountText>
+                  </BellIcon>
+                )
+              }
+              { (hasUnread(messageBell) === 0)
+                ? (
+                  null
+                )
+                : (
+                  <BellIcon name="message-circle">
+                    <UnreadMessageCountText>{hasUnread(messageBell)}</UnreadMessageCountText>
+                  </BellIcon>
+                )
+              }
+            {/* </AlignView> */}
+          </AsideView>
+        </HeaderView>
+      </TouchableOpacity>
+      { toggleTask && (
+        <>
+          <DescriptionView>
+            {/* ------------------------------------------------------------ */}
+            <HrLine/>
+            <Label>Descrição</Label>
+            <DescriptionBorderView pastDueDate={pastDueDate()}>
+              <DescriptionSpan>{data.description}</DescriptionSpan>
+            </DescriptionBorderView>
+          </DescriptionView>
+          <DescriptionView>
+            <Label>Sub-tarefas</Label>
+            <DescriptionBorderView pastDueDate={pastDueDate()}>
+              { data.sub_task_list.map((s, index) => (
+                <AlignCheckBoxView key={s.id}>
+                  <CheckBoxView>
+                    { data.status && data.status.status !== 1 && (
+                      <CheckBox
+                        disabled={false}
+                        value={s.complete}
+                        onValueChange={
+                          (newValue) => handletoggleCheckBox(newValue, index)
+                        }
+                      />
+                    )}
+                    <DescriptionSpan>{s.weige_percentage}%</DescriptionSpan>
+                    <DescriptionSpan type="check-box">{s.description}</DescriptionSpan>
+                  </CheckBoxView>
+                </AlignCheckBoxView>
+              ))}
+            </DescriptionBorderView>
+          </DescriptionView>
+
+          <AlignDetailsView>
             <DetailsView>
               <TagView>
-                <Label>Due Date & Time:</Label>
+                <Label>Prazo com horário:</Label>
                 { data.end_date !== null
                   ? (
                     <DueTimeView style={{backgroundColor:'#f5f5f5'}}>
@@ -529,7 +523,7 @@ export default function Task({ data, navigation, taskConditionIndex }) {
               (
                 <DetailsView>
                   <TagView>
-                    <Label>Ended:</Label>
+                    <Label>Enc. com horário:</Label>
                     <DueTimeView pastDueDate={endPastDueDate()}>
                       <DueTime>{formattedDateTime(data.end_date)}</DueTime>
                     </DueTimeView>
@@ -539,23 +533,7 @@ export default function Task({ data, navigation, taskConditionIndex }) {
             }
             <DetailsView>
               <TagView>
-                <Label>Priority:</Label>
-                <TaskAttributesView taskAttributes={data.task_attributes[0]-1}>
-                  <DueTime>{taskAttributesArray[JSON.stringify(data.task_attributes[0]-1)]}</DueTime>
-                </TaskAttributesView>
-              </TagView>
-            </DetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Urgency:</Label>
-                <TaskAttributesView taskAttributes={data.task_attributes[1]-1}>
-                  <DueTime>{taskAttributesArray[data.task_attributes[1]-1]}</DueTime>
-                </TaskAttributesView>
-              </TagView>
-            </DetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Complexity:</Label>
+                <Label>Complexidade:</Label>
                 <TaskAttributesView taskAttributes={data.task_attributes[1]-1}>
                   <DueTime>{taskAttributesArray[data.task_attributes[1]-1]}</DueTime>
                 </TaskAttributesView>
@@ -564,32 +542,29 @@ export default function Task({ data, navigation, taskConditionIndex }) {
 
             <DetailsView>
               <TagView>
-                <Label>Confirmation with photograph?</Label>
-                <ToText>Sim</ToText>
+                <Label>Confirmação com foto?</Label>
+                { data.confirm_photo
+                  ? <NameText>Sim</NameText>
+                  : <NameText>Não</NameText>
+                }
               </TagView>
             </DetailsView>
           </AlignDetailsView>
-
-          <DescriptionView>
-            {/* <HrLine/> */}
-            <Label>Obs.</Label>
-            <DescriptionBorderView pastDueDate={pastDueDate()}>
-              <DescriptionSpan>{data.description}</DescriptionSpan>
-            </DescriptionBorderView>
-          </DescriptionView>
+          {/* -------------------------------------------------------------- */}
+          <HrLine/>
           { data.status && data.status.status !== 1
             ? (
-              <IconsView>
+              <DatesAndButtonView>
                 <ButtonView onPress={handleMessage}>
                   <ConfirmButton >
-                    <TaskIcon name="message-square"/>
+                    <ButtonIcon name="message-circle"/>
                   </ConfirmButton>
                 </ButtonView>
                 { taskConditionIndex === 1
                   ? (
                     <ButtonView onPress={handleConfirm}>
                       <ConfirmButton>
-                        <ConfirmIcon name="check"/>
+                        <ButtonIcon name="check-circle"/>
                       </ConfirmButton>
                     </ButtonView>
                   )
@@ -600,24 +575,25 @@ export default function Task({ data, navigation, taskConditionIndex }) {
                       </ConfirmButton>
                     </ButtonView>
                   )
+
                 }
-              </IconsView>
+              </DatesAndButtonView>
             )
             : (
               <AcceptButtonView>
-                <ModalText>Accept this task?</ModalText>
+                <ModalText>Aceitar a tarefa?</ModalText>
                 <ButtonWrapper>
                   { taskConditionIndex === 1
                     ? (
                       <>
                         <ButtonView onPress={handleToggleAccept}>
                           <AcceptButton>
-                            <ButtonText>Accept</ButtonText>
+                            <ButtonText>Aceitar</ButtonText>
                           </AcceptButton>
                         </ButtonView>
                         <ButtonView onPress={() => setToggleModal(!toggleModal)}>
                           <RejectButton>
-                          <ButtonText>Decline</ButtonText>
+                          <ButtonText>Recusar</ButtonText>
                           </RejectButton>
                         </ButtonView>
                       </>
@@ -632,21 +608,15 @@ export default function Task({ data, navigation, taskConditionIndex }) {
           }
           { data.signature &&
             <ImageWrapper>
-              <Label>Confirmation Photo:</Label>
+              <Label>Foto de confirmação:</Label>
               <ImageView>
                 <Image source={{ uri: data.signature.url }}/>
               </ImageView>
             </ImageWrapper>
           }
-          <DescriptionView>
-            <BackButton onPress={handleToggleTask}>
-              <ButtonText>Back</ButtonText>
-            </BackButton>
-          </DescriptionView>
-
           <Modal isVisible={toggleModal}>
             <ModalView>
-              <ModalText>Are you sure you wish to decline this task?</ModalText>
+              <ModalText>Tem certeza de que quer recusar a tarefa?</ModalText>
               <RejectTaskInput
                 placeholder="Comentário"
                 value={rejectTaskInputValue}
@@ -656,12 +626,12 @@ export default function Task({ data, navigation, taskConditionIndex }) {
               <DatesAndButtonView>
                 <ButtonView onPress={handleCancelTask}>
                   <AcceptButton>
-                    <ButtonText>Yes</ButtonText>
+                    <ButtonText>Sim</ButtonText>
                   </AcceptButton>
                 </ButtonView>
                 <ButtonView onPress={() => setToggleModal(!toggleModal)}>
                   <RejectButton>
-                  <ButtonText>Back</ButtonText>
+                  <ButtonText>Voltar</ButtonText>
                   </RejectButton>
                 </ButtonView>
               </DatesAndButtonView>
@@ -670,18 +640,18 @@ export default function Task({ data, navigation, taskConditionIndex }) {
 
           <Modal isVisible={toggleConfirmModal}>
             <ModalView>
-              <ModalText>Confirm and end this task?</ModalText>
+              <ModalText>Tem certeza de que deseja confirmar e finalizar a tarefa?</ModalText>
                 {/* <DescriptionBorderView pastDueDate={pastDueDate()}> */}
                 {/* </DescriptionBorderView> */}
               <DatesAndButtonView>
                 <ButtonView onPress={handleConfirmWithoutPhoto}>
                   <AcceptButton>
-                    <ButtonText>Yes</ButtonText>
+                    <ButtonText>Sim</ButtonText>
                   </AcceptButton>
                 </ButtonView>
                 <ButtonView onPress={() => setToggleConfirmModal(!toggleConfirmModal)}>
                   <RejectButton>
-                    <ButtonText>Back</ButtonText>
+                    <ButtonText>Voltar</ButtonText>
                   </RejectButton>
                 </ButtonView>
               </DatesAndButtonView>
@@ -690,40 +660,30 @@ export default function Task({ data, navigation, taskConditionIndex }) {
 
           <Modal isVisible={togglePhotoModal}>
           <ModalView>
-            <ModalText>Choose photo from:</ModalText>
+            <ModalText>Qual a forma de escolher a foto?</ModalText>
             <DatesAndButtonView>
               <ButtonView onPress={() => chooseFromLibrary()}>
                 <AcceptButton>
-                  <ButtonText>Reel</ButtonText>
+                  <ButtonText>Álbum</ButtonText>
                 </AcceptButton>
               </ButtonView>
               <ButtonView onPress={() => takePhotoFromCamera()}>
                 <CameraButton>
-                  <ButtonText>Camera</ButtonText>
+                  <ButtonText>Câmera</ButtonText>
                 </CameraButton>
               </ButtonView>
             </DatesAndButtonView>
             <DatesAndButtonView>
               <ButtonView onPress={() => setTogglePhotoModal(!togglePhotoModal)}>
                 <RejectButton>
-                  <ButtonText>Back</ButtonText>
+                  <ButtonText>Voltar</ButtonText>
                 </RejectButton>
               </ButtonView>
             </DatesAndButtonView>
             </ModalView>
           </Modal>
-
-        </FormScrollView>
-        </ModalView>
-
-      </Modal>
-
-      <Modal isVisible={sendingIndicator}>
-          <ModalView>
-            <ModalText>Sending...</ModalText>
-            <ActivityIndicator size="small" color="#000"/>
-          </ModalView>
-      </Modal>
+        </>
+      )}
     </Container>
   );
 }

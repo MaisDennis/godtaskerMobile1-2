@@ -3,12 +3,13 @@ import { useSelector } from 'react-redux';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Feather';
 // -----------------------------------------------------------------------------
-import User from '~/pages/UserPage';
+import User from '~/pages/Tasks/UserPage';
 import Tasks from '~/pages/Tasks/TasksPage';
 // import TasksFinished from '~/pages/Tasks/TasksFinishedPage';
 import Messages from '~/pages/Messages/MessagesPage';
 import Contacts from '~/pages/Contacts/ContactsPage';
-import Settings from '~/pages/Settings';
+import Dashboard from '~/pages/Dashboard';
+// import Settings from '~/pages/Settings';
 // -----------------------------------------------------------------------------
 const Tab = createBottomTabNavigator();
 
@@ -31,10 +32,10 @@ export default function TabRoutes({ navigation }) {
               iconName = 'briefcase';
             } else if (route.name === 'Messages') {
               iconName = 'message-circle';
+            } else if (route.name === 'Dashboard') {
+              iconName = 'map';
             } else if (route.name === 'Contacts') {
-              iconName = 'book-open';
-            } else if (route.name === 'Settings') {
-              iconName = 'settings';
+              iconName = 'search';
               // iconName = focused ? 'settings' : 'settings';
             }
             return <Icon name={iconName} size={24} color={color} />;
@@ -42,36 +43,37 @@ export default function TabRoutes({ navigation }) {
         })}
         tabBarOptions={{
           keyboardHidesTabBar: true,
-          activeBackgroundColor: '#f5f5f5',
-          inactiveBackgroundColor: '#f5f5f5',
-          activeTintColor: '#222',
-          inactiveTintColor: '#999',
+          activeBackgroundColor: '#fff',
+          inactiveBackgroundColor: '#fff',
+          activeTintColor: '#18A0FB',
+          inactiveTintColor: '#000',
         }}
       >
         <Tab.Screen
           name="User"
-          component={User}
-          options={{ tabBarLabel: 'Chefe' }}
+          component={Tasks}
+          options={{ tabBarLabel: 'Boss' }}
         />
         <Tab.Screen
           name="Worker"
-          component={Tasks}
-          options={{ tabBarLabel: 'Funcionário' }}
+          component={User}
+          options={{ tabBarLabel: 'Jobs' }}
+        />
+        <Tab.Screen
+          name="Dashboard"
+          component={Dashboard}
+          options={{ tabBarLabel: 'Dashboard' }}
         />
         <Tab.Screen
           name="Messages"
           component={Messages}
-          options={{ tabBarLabel: 'Conversas' }}
+          options={{ tabBarLabel: 'Chat' }}
         />
+
         <Tab.Screen
           name="Contacts"
           component={Contacts}
-          options={{ tabBarLabel: 'Contatos' }}
-        />
-        <Tab.Screen
-          name="Settings"
-          component={Settings}
-          options={{ tabBarLabel: 'Config.' }}
+          options={{ tabBarLabel: 'Search' }}
         />
       </Tab.Navigator>
     </>

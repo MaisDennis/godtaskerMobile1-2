@@ -1,30 +1,33 @@
 import React, { useState, useEffect } from 'react'
-
+import { DatePickerModal } from 'react-native-paper-dates';
 import { useSelector, useDispatch } from 'react-redux';
-import { Alert, Text, TouchableOpacity } from 'react-native'
+import { Alert, TouchableOpacity } from 'react-native'
 import CheckBox from '@react-native-community/checkbox';
 import Modal from 'react-native-modal';
+import { parseISO, isBefore , isSameHour, subHours, addMinutes, format } from 'date-fns';
 // -----------------------------------------------------------------------------
 import {
-  AlignView, AddSubTaskIcon, AlignCheckBoxView,
+  AlignView, AlignCheckBoxView,
+  ButtonView, ButtonView2, ButtonText,
   CheckBoxWrapper, CheckBoxView, Container,
   DateOptionsView, DateOptions, DescriptionSpan,
   FormScrollView,
+  HrLine,
   ItemWrapperView, Input,
   LabelText,
   ModalButtonWrapper, ModalView,
-  // Options,
   RadioButtonView, RadioButtonTag, RadioButtonTagConfirmPhoto,
   RadioButtonLabel, RadioButtonOuter, RadioButtonInner0,
   RadioButtonInner1, RadioButtonInner2, RadioButtonInner3,
   RadioButtonInner4, RadioButtonLabelText,
-  SubTaskLabelText, SubTaskInput, SubTaskText,
-  SubTaskWeigeText, SubTaskIcon, SubTaskButton,
-  SubTaskView, SubTaskItemView, SubTaskButtonView,
-  SubmitView, SubmitIcon, SubmitButton,
-  SubmitButtonText,
-  TextWeigeView,
-  WeigeView, WeigeTagView, WeigeText, WeigeButton,
+  SubTaskButton, SubTaskButtonView, SubTaskCancelIcon,
+  SubTaskEditIcon, SubTaskInput, SubTaskLabelText,
+  SubTaskLeftView, SubTaskRightView,
+  SubTaskTag, SubTaskText,
+  SubTaskWeigeText, SubTaskWrapper, SubTaskView,
+  SubmitButton, SubmitButtonText, SubmitIcon,
+  SubmitView,
+  WeigeView, WeigeTagView, WeigeText,
 } from './styles'
 import NumberInput from '~/components/NumberInput'
 import { updateTasks } from '~/store/modules/task/actions';
@@ -38,26 +41,40 @@ export default function TaskCreatePage({ navigation }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState();
   const [prior, setPrior] = useState(4);
-  const [urgent, setUrgent] = useState(4);
-  const [complex, setComplex] = useState(4);
   const [confirmPhoto, setConfirmPhoto] = useState(1);
   const [startDate, setStartDate] = useState(new Date());
   const [dueDate, setDueDate] = useState(new Date());
   const [contacts, setContacts] = useState([]);
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
   const [toggleModal, setToggleModal] = useState(false);
+  const [toggleDates, setToggleDates] = useState(false);
   const [submitError, setSubmitError] = useState(false);
-
   const [subTaskList, setSubTaskList] = useState([]);
   const [editSubTaskIndex, setEditSubTaskIndex] = useState();
-  const [toggleAddSubTask, setToggleAddSubTask] = useState(false);
   const [addSubTaskInputValue, setAddSubTaskInputValue] = useState();
   const [addWeigeInputValue, setAddWeigeInputValue] = useState(1);
   const [editSubTaskInputValue, setEditSubTaskInputValue] = useState();
   const [editWeigeInputValue, setEditWeigeInputValue] = useState(1);
   const [subTaskToggleEdit, setSubTaskToggleEdit] = useState(false);
+  const [date, setDate] = useState();
+  const [open, setOpen] = useState(false);
+  const [sameHourCheck, setSameHourCheck] = useState(false)
+    const [urgent, setUrgent] = useState(4);
+  const [complex, setComplex] = useState(4);
 
-  let editedWorkers = [];
+  // functions for Date Picker
+  const onDismissSingle = React.useCallback(() => {
+    setOpen(false);
+  }, [setOpen]);
+
+  const onConfirmSingle = React.useCallback(
+    (params) => {
+      setOpen(false);
+      setDate(params.date);
+    },
+    [setOpen, setDate]
+  );
+
   const taskAttributesArray = [
     { id: 1, tag: 'baixa'},
     { id: 2, tag: 'média'},
@@ -75,8 +92,10 @@ export default function TaskCreatePage({ navigation }) {
   }, [ userId ])
 
   async function loadContacts(userID) {
-    const response = await api.get(`users/${userID}/contact-list`, {
-    })
+    // const response = await api.get(`users/${userID}/contact-list`, {
+    // })
+    const response = await api.get(`/users/${userID}/following`)
+
     const checkedList = response.data
     checkedList.forEach(c => {
       c.checked = false;
@@ -84,6 +103,7 @@ export default function TaskCreatePage({ navigation }) {
     setContacts(checkedList)
   }
 
+  let editedWorkers = [];
   async function handletoggleCheckBox(value, position) {
     setToggleCheckBox(!toggleCheckBox) // this distoggles the checkbox
     editedWorkers = contacts;
@@ -98,7 +118,15 @@ export default function TaskCreatePage({ navigation }) {
     setToggleModal(!toggleModal)
   }
 
+  function handleToggleDates() {
+    setToggleDates(!toggleDates)
+  }
+
+
+
   function handleAddSubTask() {
+    if (addSubTaskInputValue === undefined) return;
+
     let editedSubTaskList = subTaskList
     const sub_task_id = Math.floor(Math.random() * 1000000)
     editedSubTaskList.push({
@@ -186,15 +214,80 @@ export default function TaskCreatePage({ navigation }) {
   }
 
   function handleSubmit() {
+    let countChecked = 0;
+    contacts.map(c => {
+      if(c.checked == true) {
+        countChecked += 1
+      }
+    })
+    if (countChecked === 0) {
+      Alert.alert(
+        'Please choose a person',
+        'Use the "Following List" button and select who(m) the task will be sent to',
+        [{ style: "default" }],
+        { cancelable: true },
+      );
+      return
+    }
+    if (name === '') {
+      Alert.alert(
+        'Please insert a Title',
+        '',
+        [{ style: "default" }],
+        { cancelable: true },
+      )
+      return
+    }
+    if (isBefore(startDate, subHours(new Date(), 1))) {
+      Alert.alert(
+        'Start Date is in the past',
+        'Start Date cannot be set before 1 hour prior to now',
+        [{ style: "default" }],
+        { cancelable: true },
+      )
+      return
+    }
+    if (isBefore(dueDate, startDate)) {
+      Alert.alert(
+        'Due Date is before Start Date',
+        'The Due Date & Time must be set after the Start Date & Time',
+        [{ style: "default" }],
+        { cancelable: true },
+      )
+      return
+    }
+    if (!sameHourCheck && isSameHour(dueDate, new Date())) {
+      Alert.alert(
+        'Due Date is set within the next hour',
+        'Are you sure this is OK?',
+        [{ style: "default" }],
+        { cancelable: true },
+      )
+      setSameHourCheck(true)
+      return
+    }
+
     try {
       contacts.map(c => {
-        if(c.checked == true) createTasks(c)
-        return c;
+        if(c.checked == true) {
+          createTasks(c)
+          return c;
+        }
       })
-      Alert.alert('Tarefa cadastrada com sucesso!')
+      Alert.alert(
+        'Success!',
+        'Task Registered',
+        [{ style: "default" }],
+        { cancelable: true },
+        )
     } catch(error) {
       setSubmitError(true)
-      Alert.alert('Erro ao cadastrar a tarefa.')
+      Alert.alert(
+        'Error: Task not registered',
+        'Please try again',
+        [{ style: "default" }],
+        { cancelable: true },
+      )
     }
     // dispatch(updateTasks(new Date()))
     navigation.goBack()
@@ -204,124 +297,150 @@ export default function TaskCreatePage({ navigation }) {
     <Container>
       <FormScrollView contentContainerStyle={{ alignItems: 'center'}}>
         <ItemWrapperView>
-          <LabelText>Tarefa:</LabelText>
+          <LabelText>Send to:</LabelText>
+          <ButtonView onPress={handleToggleModal}>
+            <ButtonText>Following List</ButtonText>
+          </ButtonView>
+          {/* <HrDivider/> */}
+        </ItemWrapperView>
+
+        <ItemWrapperView>
+          <LabelText>Title:</LabelText>
           <Input
+            enablesReturnKeyAutomatically
+            multiline
             value={name}
             onChangeText={setName}
-          ></Input>
+            placeholder="Wash the car"
+          />
         </ItemWrapperView>
 
         <ItemWrapperView>
-          <LabelText>Descrição:</LabelText>
-          <Input
-            value={description}
-            onChangeText={setDescription}
-          ></Input>
-        </ItemWrapperView>
-
-        <ItemWrapperView>
-          <LabelText>Adicionar sub-tarefa:</LabelText>
+          <LabelText>Sub-item:</LabelText>
           <SubTaskView>
-            <TextWeigeView>
               <SubTaskInput
-                value={addSubTaskInputValue}
+                enablesReturnKeyAutomatically
+                multiline
+                numberOfLines={4}
                 onChangeText={setAddSubTaskInputValue}
-                mutiline={true}
-                numberOfLines={5}
+                placeholder="1. Use soap..."
                 textBreakStrategy="highQuality"
+                value={addSubTaskInputValue}
               />
               <WeigeView>
-                <WeigeTagView>
-                  <WeigeText>Peso:</WeigeText>
-                  <NumberInput
-                    numberInputValue={addWeigeInputValue}
-                    setNumberInputValue={setAddWeigeInputValue}
-                  />
-                </WeigeTagView>
-                <WeigeButton onPress={handleAddSubTask}>
-                  <AddSubTaskIcon name="check-circle" size={55}/>
-                </WeigeButton>
+                <WeigeText>Sub-item weige:</WeigeText>
+                <NumberInput
+                  numberInputValue={addWeigeInputValue}
+                  setNumberInputValue={setAddWeigeInputValue}
+                />
               </WeigeView>
-            </TextWeigeView>
           </SubTaskView>
-          <LabelText>Sub-tarefas:</LabelText>
+          <WeigeView>
+            <ButtonView2 onPress={handleAddSubTask}>
+              <ButtonText>Add sub-item</ButtonText>
+            </ButtonView2>
+          </WeigeView>
+        </ItemWrapperView>
+
+        <ItemWrapperView>
+          {subTaskList != ''
+            ? (<LabelText>Sub-item List:</LabelText>)
+            : null
+          }
           { subTaskList.map((s, index) => (
             <SubTaskView key={index}>
               {
                 subTaskToggleEdit && (editSubTaskIndex === index)
                 ? (
-                  <SubTaskItemView>
-                    <SubTaskView>
-                    <SubTaskLabelText>{index+1}</SubTaskLabelText>
-                    <SubTaskText>{s.description}</SubTaskText>
-                    </SubTaskView>
-                    <WeigeView>
-                      <WeigeTagView>
-                        <WeigeText>Peso:</WeigeText>
-                        <SubTaskWeigeText>{s.weige}</SubTaskWeigeText>
-                      </WeigeTagView>
-                      <SubTaskButtonView>
-                        <SubTaskButton onPress={() => handleOpenEditSubTask(index)}>
-                          <SubTaskIcon name="edit"/>
-                        </SubTaskButton>
-                        <SubTaskButton onPress={() => handleDeleteSubTask(index)}>
-                          <SubTaskIcon name="x-circle"/>
-                        </SubTaskButton>
-                      </SubTaskButtonView>
-                    </WeigeView>
-                    <SubTaskView>
-                      <TextWeigeView>
-                        <SubTaskInput
-                          value={editSubTaskInputValue}
-                          onChangeText={setEditSubTaskInputValue}
-                          mutiline={true}
-                        />
-                        <WeigeView>
+                  <>
+                    <SubTaskWrapper>
+                      <SubTaskLeftView>
+                        <SubTaskTag>
+                          <SubTaskLabelText>{index+1}.</SubTaskLabelText>
+                          <SubTaskText>{s.description}</SubTaskText>
+                        </SubTaskTag>
+                      </SubTaskLeftView>
+
+                      <SubTaskRightView>
+                        <SubTaskButtonView>
+                          <SubTaskButton onPress={() => handleEditSubTask(index)}>
+                            <SubTaskEditIcon name="edit-2"/>
+                          </SubTaskButton>
+                          <SubTaskButton onPress={() => handleDeleteSubTask(index)}>
+                            <SubTaskCancelIcon name="x-circle"/>
+                          </SubTaskButton>
+                        </SubTaskButtonView>
+                        <SubTaskTag>
                           <WeigeTagView>
-                            <WeigeText>Peso:</WeigeText>
-                            <NumberInput
-                              numberInputValue={editWeigeInputValue}
-                              setNumberInputValue={setEditWeigeInputValue}
-                            />
+                            <WeigeText>Weige:</WeigeText>
+                            <SubTaskWeigeText>{s.weige}</SubTaskWeigeText>
                           </WeigeTagView>
-                          <WeigeButton onPress={() => handleEditSubTask(index)}>
-                            <AddSubTaskIcon name="check-circle" size={55}/>
-                          </WeigeButton>
-                        </WeigeView>
-                      </TextWeigeView>
-                    </SubTaskView>
-                  </SubTaskItemView>
+                        </SubTaskTag>
+                      </SubTaskRightView>
+                    </SubTaskWrapper>
+
+                    <SubTaskInput
+                      enablesReturnKeyAutomatically
+                      multiline
+                      numberOfLines={1}
+                      onChangeText={setEditSubTaskInputValue}
+                      value={editSubTaskInputValue}
+                    />
+                    <WeigeView>
+                      <WeigeText>Sub-item weige:</WeigeText>
+                      <NumberInput
+                        numberInputValue={editWeigeInputValue}
+                        setNumberInputValue={setEditWeigeInputValue}
+                      />
+                    </WeigeView>
+                    <HrLine/>
+                  </>
                 )
                 : (
-                  <SubTaskItemView>
-                    <SubTaskView>
-                      <SubTaskLabelText>{index+1}</SubTaskLabelText>
-                      <SubTaskText>{s.description}</SubTaskText>
-                    </SubTaskView>
-                    <WeigeView>
-                      <WeigeTagView>
-                        <WeigeText>Peso:</WeigeText>
-                        <SubTaskWeigeText>{s.weige}</SubTaskWeigeText>
-                      </WeigeTagView>
-                      <SubTaskButtonView>
-                        <SubTaskButton onPress={() => handleOpenEditSubTask(index)}>
-                          <SubTaskIcon name="edit"/>
-                        </SubTaskButton>
-                        <SubTaskButton onPress={() => handleDeleteSubTask(index)}>
-                          <SubTaskIcon name="x-circle"/>
-                        </SubTaskButton>
-                      </SubTaskButtonView>
-                    </WeigeView>
-                  </SubTaskItemView>
+                  <>
+                    <SubTaskWrapper>
+                      <SubTaskLeftView>
+                        <SubTaskTag>
+                          <SubTaskLabelText>{index+1}.</SubTaskLabelText>
+                          <SubTaskText>{s.description}</SubTaskText>
+                        </SubTaskTag>
+                      </SubTaskLeftView>
+
+                      <SubTaskRightView>
+                        <SubTaskButtonView>
+                          <SubTaskButton onPress={() => handleOpenEditSubTask(index)}>
+                            <SubTaskEditIcon name="edit-2"/>
+                          </SubTaskButton>
+                          <SubTaskButton onPress={() => handleDeleteSubTask(index)}>
+                            <SubTaskCancelIcon name="x-circle"/>
+                          </SubTaskButton>
+                        </SubTaskButtonView>
+                        <SubTaskTag>
+                          <WeigeTagView>
+                            <WeigeText>Weige:</WeigeText>
+                            <SubTaskWeigeText>{s.weige}</SubTaskWeigeText>
+                          </WeigeTagView>
+                        </SubTaskTag>
+                      </SubTaskRightView>
+                    </SubTaskWrapper>
+                    <HrLine/>
+                  </>
                 )
               }
             </SubTaskView>
           ))}
-          <LabelText>(não esquecer de confirmar as alterações em sub-tarefas para que sejam salvas)</LabelText>
-        </ItemWrapperView>
+         </ItemWrapperView>
 
         <ItemWrapperView>
-          <LabelText>Início:</LabelText>
+        <WeigeView>
+          <ButtonView
+            onPress={handleToggleDates}
+            uppercase={false}
+            mode="outlined"
+          >
+            <ButtonText>Start & Due Dates</ButtonText>
+          </ButtonView>
+          {/* <LabelText>Due Date:</LabelText>
           <DateOptionsView>
             <DateOptions
               date={startDate}
@@ -332,10 +451,12 @@ export default function TaskCreatePage({ navigation }) {
               textColor="#666"
               textSize="24"
             />
-          </DateOptionsView>
+          </DateOptionsView> */}
+          </WeigeView>
+          {/* <HrDivider/> */}
         </ItemWrapperView>
 
-        <ItemWrapperView>
+        {/* <ItemWrapperView>
           <LabelText>Prazo:</LabelText>
           <DateOptionsView>
             <DateOptions
@@ -348,10 +469,10 @@ export default function TaskCreatePage({ navigation }) {
               textSize="30"
             />
           </DateOptionsView>
-        </ItemWrapperView>
+        </ItemWrapperView> */}
 
         <ItemWrapperView>
-          <LabelText>Prioridades:</LabelText>
+          <LabelText>Priority:</LabelText>
           {/* <Options selectedValue={prior} onValueChange={setPrior}>
             { taskAttributesArray.map(t => (
               <Options.Item key={t.id} label={t.tag} value={t.id}/>
@@ -359,19 +480,19 @@ export default function TaskCreatePage({ navigation }) {
           </Options> */}
           <RadioButtonView>
             <RadioButtonTag onPress={() => setPrior(1)}>
-              <RadioButtonLabel>baixa</RadioButtonLabel>
+              <RadioButtonLabel>Low</RadioButtonLabel>
               <RadioButtonOuter>
                 <RadioButtonInner1 switch={prior}/>
               </RadioButtonOuter>
             </RadioButtonTag>
             <RadioButtonTag onPress={() => setPrior(2)}>
-              <RadioButtonLabel>média</RadioButtonLabel>
+              <RadioButtonLabel>Medium</RadioButtonLabel>
               <RadioButtonOuter>
                 <RadioButtonInner2 switch={prior}/>
               </RadioButtonOuter>
             </RadioButtonTag>
             <RadioButtonTag onPress={() => setPrior(3)}>
-              <RadioButtonLabel>alta</RadioButtonLabel>
+              <RadioButtonLabel>High</RadioButtonLabel>
               <RadioButtonOuter>
                 <RadioButtonInner3 switch={prior}/>
               </RadioButtonOuter>
@@ -383,9 +504,10 @@ export default function TaskCreatePage({ navigation }) {
               </RadioButtonOuter>
             </RadioButtonTag>
           </RadioButtonView>
+          {/* <HrDivider/> */}
         </ItemWrapperView>
 
-        <ItemWrapperView>
+        {/* <ItemWrapperView>
           <LabelText>Urgência:</LabelText>
           <RadioButtonView>
             <RadioButtonTag onPress={() => setUrgent(1)}>
@@ -413,15 +535,10 @@ export default function TaskCreatePage({ navigation }) {
               </RadioButtonOuter>
             </RadioButtonTag>
           </RadioButtonView>
-        </ItemWrapperView>
+        </ItemWrapperView> */}
 
-        <ItemWrapperView>
+        {/* <ItemWrapperView>
           <LabelText>Complexidade:</LabelText>
-          {/* <Options selectedValue={complex} onValueChange={setComplex}>
-            { taskAttributesArray.map(t => (
-              <Options.Item key={t.id} label={t.tag} value={t.id}/>
-            ))}
-          </Options> */}
           <RadioButtonView>
             <RadioButtonTag onPress={() => setComplex(1)}>
               <RadioButtonLabel>baixa</RadioButtonLabel>
@@ -448,10 +565,10 @@ export default function TaskCreatePage({ navigation }) {
               </RadioButtonOuter>
             </RadioButtonTag>
           </RadioButtonView>
-        </ItemWrapperView>
+        </ItemWrapperView> */}
 
         <ItemWrapperView>
-          <RadioButtonLabelText>Requer foto de confirmação ao completar a tarefa?</RadioButtonLabelText>
+          <RadioButtonLabelText>Confirm with photo?</RadioButtonLabelText>
           {/* <Options selectedValue={confirmPhoto} onValueChange={setConfirmPhoto}>
             { confirmPhotoArray.map(t => (
               <Options.Item key={t.id} label={t.tag} value={t.id}/>
@@ -459,25 +576,187 @@ export default function TaskCreatePage({ navigation }) {
           </Options> */}
           <RadioButtonView>
             <RadioButtonTagConfirmPhoto onPress={() => setConfirmPhoto(1)}>
-              <RadioButtonLabel>Sim</RadioButtonLabel>
+              <RadioButtonLabel>Yes</RadioButtonLabel>
               <RadioButtonOuter>
                 <RadioButtonInner1 switch={confirmPhoto}/>
               </RadioButtonOuter>
             </RadioButtonTagConfirmPhoto>
             <RadioButtonTagConfirmPhoto onPress={() => setConfirmPhoto(0)}>
-              <RadioButtonLabel>Não é requisito</RadioButtonLabel>
+              <RadioButtonLabel>No</RadioButtonLabel>
               <RadioButtonOuter>
                 <RadioButtonInner0 switch={confirmPhoto}/>
               </RadioButtonOuter>
             </RadioButtonTagConfirmPhoto>
           </RadioButtonView>
+          {/* <HrDivider/> */}
+        </ItemWrapperView>
+        <ItemWrapperView>
+          <LabelText>Other Comments:</LabelText>
+          <Input
+            enablesReturnKeyAutomatically
+            multiline
+            numberOfLines={4}
+            onChangeText={setDescription}
+            placeholder="Don't forget to wax"
+            value={description}
+          />
         </ItemWrapperView>
 
         <ItemWrapperView>
-          <SubmitButton onPress={handleToggleModal}>
-            <SubmitButtonText>Enviar</SubmitButtonText>
+          <SubmitButton onPress={handleSubmit}>
+            <SubmitButtonText>Send</SubmitButtonText>
           </SubmitButton>
         </ItemWrapperView>
+
+        <>
+
+      <DatePickerModal
+        // locale={'en'} optional, default: automatic
+        mode="single"
+        visible={open}
+        onDismiss={onDismissSingle}
+        date={date}
+        onConfirm={onConfirmSingle}
+        // validRange={{
+        //   startDate: new Date(2021, 1, 2),  // optional
+        //   endDate: new Date(), // optional
+        // }}
+        // onChange={} // same props as onConfirm but triggered without confirmed by user
+        // saveLabel="Save" // optional
+        // label="Select date" // optional
+        // animationType="slide" // optional, default is 'slide' on ios/android and 'none' on web
+      />
+    </>
+
+        <Modal isVisible={toggleDates}>
+          <ModalView>
+            <CheckBoxWrapper>
+            <LabelText>Start Date:</LabelText>
+            <DateOptionsView>
+              <DateOptions
+                date={startDate}
+                onDateChange={setStartDate}
+                locale='pt'
+                is24hourSource='locale'
+                androidVariant="nativeAndroid"
+                textColor="#666"
+                textSize="24"
+              />
+            </DateOptionsView>
+            <LabelText>Due Date:</LabelText>
+            <DateOptionsView>
+              <DateOptions
+                date={dueDate}
+                onDateChange={setDueDate}
+                locale='pt'
+                is24hourSource='locale'
+                androidVariant="nativeAndroid"
+                textColor="#666"
+                textSize="30"
+              />
+            </DateOptionsView>
+              {/* <LabelText>Due Date:</LabelText>
+              <DatesNumberWrapper>
+                <DatesNumberView>
+                  <DatesText>Day</DatesText>
+                  <InputDate
+                    // autoFocus={true}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                  />
+                </DatesNumberView>
+                <DatesIntersection1View>
+                  <DatesText></DatesText>
+                  <DatesText>/</DatesText>
+                </DatesIntersection1View>
+                <DatesNumberView>
+                  <DatesText>Month</DatesText>
+                  <InputDate
+                    keyboardType="number-pad"
+                    maxLength={2}
+                  />
+                </DatesNumberView>
+                <DatesIntersection1View>
+                  <DatesText></DatesText>
+                  <DatesText>/</DatesText>
+                </DatesIntersection1View>
+                <DatesIntersection2View>
+                  <DatesText></DatesText>
+                  <DatesText>20</DatesText>
+                </DatesIntersection2View>
+                <DatesNumberView>
+                  <DatesText>Year</DatesText>
+                  <InputDate
+                    keyboardType="number-pad"
+                    maxLength={2}
+                  />
+                </DatesNumberView>
+              </DatesNumberWrapper>
+
+              <DatesNumberWrapper>
+                <DatesButton>
+                  <DatesButtonText>Today</DatesButtonText>
+                </DatesButton>
+                <DatesButton>
+                  <DatesButtonText>Tomorrow</DatesButtonText>
+                </DatesButton>
+                <DatesButton>
+                  <DatesButtonText>Next Week</DatesButtonText>
+                </DatesButton>
+                <DatesButton>
+                  <DatesButtonText>Next Year</DatesButtonText>
+                </DatesButton>
+              </DatesNumberWrapper>
+
+              <DatesNumberWrapper>
+              <DatesNumberView>
+                  <DatesText>Hour</DatesText>
+                  <InputDate
+                    keyboardType="number-pad"
+                    maxLength={2}
+                    returnKeyType='next'
+                  />
+                </DatesNumberView>
+                <DatesIntersection1View>
+                  <DatesText></DatesText>
+                  <DatesText>:</DatesText>
+                </DatesIntersection1View>
+                <DatesNumberView>
+                  <DatesText>Minutes</DatesText>
+                  <InputDate
+                    keyboardType="number-pad"
+                    maxLength={2}
+                  />
+                </DatesNumberView>
+                <DatesLabelView>
+                  <DatesText></DatesText>
+                  <DatesText>p.m.</DatesText>
+                </DatesLabelView>
+              </DatesNumberWrapper>
+
+              <DatesNumberWrapper>
+                <DatesButton2>
+                  <DatesButtonText>:00</DatesButtonText>
+                </DatesButton2>
+                <DatesButton2>
+                  <DatesButtonText>:15</DatesButtonText>
+                </DatesButton2>
+                <DatesButton2>
+                  <DatesButtonText>:30</DatesButtonText>
+                </DatesButton2>
+                <DatesButton2>
+                  <DatesButtonText>:45</DatesButtonText>
+                </DatesButton2>
+              </DatesNumberWrapper> */}
+              <HrLine/>
+
+              <ButtonView onPress={handleToggleDates}>
+                  <ButtonText>OK</ButtonText>
+              </ButtonView>
+            </CheckBoxWrapper>
+          </ModalView>
+        </Modal>
+
 
         <Modal isVisible={toggleModal}>
           { submitError
@@ -489,7 +768,7 @@ export default function TaskCreatePage({ navigation }) {
             : (
               <ModalView>
                 <CheckBoxWrapper>
-                  <LabelText>Funcionário(s):</LabelText>
+                  <LabelText>Following List:</LabelText>
                   { contacts.map((c, index) => (
                     <AlignCheckBoxView key={index}>
                       <CheckBoxView>
@@ -502,15 +781,22 @@ export default function TaskCreatePage({ navigation }) {
                           }
                         />
                         <DescriptionSpan type="check-box">{c.worker_name}</DescriptionSpan>
+
                       </CheckBoxView>
+                      <HrLine/>
                     </AlignCheckBoxView>
                   ))}
+
+                    <ButtonView onPress={handleToggleModal}>
+                      <ButtonText>OK</ButtonText>
+                    </ButtonView>
+
                 </CheckBoxWrapper>
               </ModalView>
             )
           }
 
-          <ModalButtonWrapper>
+          {/* <ModalButtonWrapper>
             <TouchableOpacity onPress={handleToggleModal}>
               <ItemWrapperView>
                 <SubmitView>
@@ -530,7 +816,7 @@ export default function TaskCreatePage({ navigation }) {
                 </SubmitView>
               </ItemWrapperView>
             </TouchableOpacity>
-          </ModalButtonWrapper>
+          </ModalButtonWrapper> */}
 
         </Modal>
       </FormScrollView>
