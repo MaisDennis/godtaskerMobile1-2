@@ -10,21 +10,23 @@ color: #000;
 
 export const BioText = styled.Text`
   font-size: 14px;
-  line-height: 18px;
-  padding: 8px;
+  line-height: 20px;
+  margin: 8px;
+  /* background-color: #4433ee; */
 
 `;
 
 export const BlockLarge = styled.View`
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
+  align-items: center;
+  justify-content: center;
   height: auto;
   width: 100%;
   border-radius: 8px;
   border-width: 1px;
   border-color: #000;
-  margin: 0;
+  margin-bottom: 32px;
   padding: 8px;
 
   /* background-color: #f5f5f5; */
@@ -142,11 +144,12 @@ export const FollowButton = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  width: 84px;
-  height: 28px;
+  width: 96px;
+  height: 32px;
   border-radius: 16px;
   margin: auto 8px;
   background-color: #18A0FB;
+  /* background-color: #4433ee; */
 `;
 
 export const FollowText = styled.Text`
@@ -159,12 +162,14 @@ export const FollowingButton = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  width: 40%;
+  width: 96px;
   height: 32px;
   border-radius: 16px;
   border-width: 2px;
   border-color: #18A0FB;
+  margin: auto 8px;
   background-color: #fff;
+
 `;
 
 export const FollowingText = styled.Text`
@@ -189,7 +194,7 @@ export const FollowersWrapper = styled.View`
 `;
 
 export const FormScrollView = styled.ScrollView`
-  height: 100%;
+  height: auto;
   width: 100%;
   /* margin: 12px 0; */
   background-color: #fff;
@@ -218,7 +223,7 @@ export const HeaderTabView = styled.View`
 display: flex;
 flex-direction: row;
 align-items: center;
-justify-content: space-between;
+justify-content: flex-end;
 width: 95%;
 height: 10%;
 /* padding: 4px 0; */
@@ -237,6 +242,7 @@ export const HeaderTouchable = styled(TouchableOpacity)`
 `;
 
 export const Iicon = styled(Icon)`
+  color: #18A0FB;
 `;
 
 export const Label = styled.Text`
@@ -407,6 +413,24 @@ export const List = styled.FlatList.attrs({
   height: 100%;
 `;
 
+export const MessageButton = styled(TouchableOpacity)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: 28px;
+  border-radius: 16px;
+  margin: auto 20px;
+  background-color: #fff;
+  /* background-color: #4433ee; */
+`;
+
+export const MessageIcon = styled(Icon)`
+  font-size: 24px;
+  color: #18A0FB;
+`;
+
 export const SearchBarTextInput = styled.TextInput`
   height: 80%;
   width: 50%;
@@ -416,7 +440,7 @@ export const SearchBarTextInput = styled.TextInput`
   background-color: #ddd;
 `;
 
-export const SocialMediaView = styled.View`
+export const SocialMediaView = styled(TouchableOpacity)`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -424,7 +448,7 @@ export const SocialMediaView = styled.View`
   /* justify-content: space-between; */
   height: 100%;
   width: 40%;
-  /* margin: 4px 0; */
+  margin: 8px;
   /* background-color: #f5f5f5; */
     /* background-color: #fee; */
 `;
@@ -496,10 +520,10 @@ export const StatusLineWorker = styled.View`
 `;
 
 export const StatusView = styled.View`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
+  /* display: flex; */
+  /* flex-direction: row; */
+  /* align-items: center; */
+  /* justify-content: space-between; */
   height: auto;
   width: 90%;
   margin: 4px 0;
@@ -517,7 +541,7 @@ export const Title = styled.Text`
 export const UserNameText = styled.Text`
   font-size: 18px;
   font-weight: bold;
-  margin: auto 20px;
+  margin: auto 8px;
   color: #18A0FB;
 `;
 

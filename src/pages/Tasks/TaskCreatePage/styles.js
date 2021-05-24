@@ -1,22 +1,9 @@
 import styled from 'styled-components/native';
 import { ScrollView, TouchableOpacity } from 'react-native'
 import DatePicker from 'react-native-date-picker' // https://github.com/henninghall/react-native-date-picker
-import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/Feather';
 import Button from '~/components/Button';
 
-export const AlignView = styled.View`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-`;
-export const AddSubTaskIcon = styled(Icon)`
-  font-size: 18px;
-  font-weight: bold;
-  color: #4433ee;
-  /* margin: 4px; */
-`;
 export const AlignCheckBoxView = styled.View`
   display: flex;
   flex-direction:column;
@@ -53,19 +40,6 @@ export const ButtonView2 = styled(TouchableOpacity)`
   padding: 0 16px;
   background-color: #009966;
 `;
-
-// export const ButtonView = styled(TouchableOpacity)`
-//   display: flex;
-//   flex-direction: row;
-//   align-items: center;
-//   justify-content: center;
-//   height: 40px;
-//   width: 100%;
-//   border-radius: 8px;
-//   margin: 8px auto;
-//   padding: 0 16px;
-//   background-color: #000;
-// `;
 
 export const ButtonText = styled.Text`
   font-size: 14px;
@@ -119,6 +93,7 @@ export const DateOptions = styled(DatePicker)`
   margin: 0;
   /* background-color: #f5f; */
 `;
+
 export const DescriptionSpan = styled.Text`
   font-weight: normal;
   font-size: 14px;
@@ -192,14 +167,6 @@ flex-direction: row;
 justify-content: space-between;
 width: 33%;
 margin-top: 12px;
-`;
-
-export const Options = styled(Picker)`
-  height: 48px;
-  width: 80%;
-  font-size: 14px;
-  border-radius: 4px;
-  background-color: #ddd;
 `;
 
 export const RadioButtonView = styled.View`
@@ -293,6 +260,24 @@ export const RadioButtonInner4 = styled.View`
   background-color: ${props => props.switch === 4 ? '#000' : '#ddd'};
 `;
 
+export const SubmitButton = styled(TouchableOpacity)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 100%;
+  border-radius: 8px;
+  margin: 0 auto 40px;
+  padding: 0 16px;
+  background-color: #18A0FB;
+`;
+export const SubmitButtonText = styled.Text`
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+`;
+
 export const SubTaskButton = styled(TouchableOpacity)`
   display: flex;
   flex-direction: row;
@@ -332,18 +317,6 @@ export const SubTaskEditIcon = styled(Icon)`
   /* text-align: center; */
   margin: auto;
   color: #000;
-  /* background-color: #111; */
-`;
-
-
-export const SubTaskIcon = styled(Icon)`
-  height: auto;
-  width: auto;
-  font-size: 20px;
-  font-weight: normal;
-  /* text-align: center; */
-  margin: auto;
-  color: #4433ee;
   /* background-color: #111; */
 `;
 
@@ -411,11 +384,8 @@ export const SubTaskText = styled.Text`
 export const SubTaskWeigeText = styled.Text`
   font-size: 14px;
   font-weight: normal;
-  color: #222;
-  /* height: 100%; */
-  /* text-align: right; */
   width: auto;
-  /* margin: 4px; */
+  color: #000;
   /* background-color: #4433ee; */
 `;
 
@@ -439,41 +409,7 @@ export const SubTaskView = styled.View`
   align-items: center;
   height: auto;
   width: 100%;
-  /* border-radius: 4px;
-  border-width: 1px;
-  border-color: #000; */
   /* background-color: #f5f; */
-`;
-
-export const SubmitButton = styled(TouchableOpacity)`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  height: 40px;
-  width: 100%;
-  border-radius: 8px;
-  margin: 0 auto 40px;
-  padding: 0 16px;
-  background-color: #18A0FB;
-`;
-export const SubmitButtonText = styled.Text`
-  font-size: 14px;
-  font-weight: bold;
-  color: #fff;
-`;
-
-export const SubmitIcon = styled(Icon)``;
-
-export const SubmitView = styled.View`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  height: 40px;
-  width: 40px;
-  margin: 0 4px 24px 4px;
-  border-radius: 40px;
-  /* background-color: #4433ee; */
 `;
 
 export const SubmitWrapper = styled.View`

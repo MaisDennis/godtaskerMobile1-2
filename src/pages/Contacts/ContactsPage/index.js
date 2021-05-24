@@ -30,7 +30,7 @@ export default function ContactsPage({ navigation }) {
   const [inputState, setInputState] = useState('');
 
   useEffect(() => {
-    loadWorkers();
+    loadWorkers('');
   }, [contacts_update]);
 
   const formattedDate = fdate =>
@@ -84,7 +84,7 @@ export default function ContactsPage({ navigation }) {
 
   async function loadWorkers(input) {
     setInputState(input)
-    let response = await api.get('/workers', {
+    const response = await api.get('/workers', {
       params: {
         nameFilter: `${input}`,
       }

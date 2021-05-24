@@ -51,12 +51,12 @@ export default function TabRoutes({ navigation }) {
       >
         <Tab.Screen
           name="User"
-          component={Tasks}
+          component={Messages}
           options={{ tabBarLabel: 'Boss' }}
         />
         <Tab.Screen
           name="Worker"
-          component={User}
+          component={Tasks}
           options={{ tabBarLabel: 'Jobs' }}
         />
         <Tab.Screen
@@ -66,7 +66,7 @@ export default function TabRoutes({ navigation }) {
         />
         <Tab.Screen
           name="Messages"
-          component={Messages}
+          component={User}
           options={{ tabBarLabel: 'Chat' }}
         />
 

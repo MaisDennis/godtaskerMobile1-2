@@ -28,6 +28,9 @@ export function* updateProfile({ payload }) {
         phonenumber,
         birth_date,
         gender,
+        instagram,
+        linkedin,
+        bio,
         // avatar_id
       });
       responseWorker = yield call(api.put, 'workers/no-photo', {
@@ -41,6 +44,9 @@ export function* updateProfile({ payload }) {
         email,
         birth_date,
         gender,
+        instagram,
+        linkedin,
+        bio,
         // avatar_id
       });
 

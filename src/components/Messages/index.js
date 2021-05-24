@@ -2,84 +2,70 @@ import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import { TouchableOpacity } from 'react-native'
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR, enUS } from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 // -----------------------------------------------------------------------------
 import {
-  Container, LeftDoubleView, LeftView,
-  AlignView, Image, BodyView, MainView, TitleView, TitleIcon, TitleWrapper,
-  TitleText, SenderText, LastMessageView, LastMessageText, RightView,
-  LastMessageTimeView, LastMessageTimeText,
-  MessageIcon, UnreadMessageCountText, UserImageBackgroundView, WorkerImageBackgroundView,
+  AlignView,
+  BodyView,
+  Container,
+  Image,
+  LastMessageView, LastMessageText, LastMessageTimeView, LastMessageTimeText,
+  LeftView,
+  MainView, MessageIcon,
+  RightView,
+  SenderText,
+  TitleView,
+  UnreadMessageCountText,
+  WorkerImageBackgroundView,
 } from './styles'
+
 import { updateForwardMessage, updateMessagesRequest } from '~/store/modules/message/actions';
 import api from '~/services/api';
 
 export default function Messages({ data, navigation }) {
-  const worker_id = useSelector(state => state.worker.profile.id);
+  const dispatch = useDispatch();
   const forwardValue = useSelector(state => state.message.forward_message.message);
   const updatedMessage = useSelector(state => state.message.profile)
-  const dispatch = useDispatch();
-  const user = useSelector(state => state.user.profile)
-  const userIsWorker = worker_id === data.worker_id;
-  const messageWorkerId = data.worker_id;
-  const messageUserId = data.user_id;
+  const profileUserId = useSelector(state => state.user.profile.id)
+
 
   const [resetConversation, setResetConversation] = useState();
   const [messageBell, setMessageBell] = useState();
   const [lastMessage, setLastMessage] = useState();
   const [lastMessageTime, setLastMessageTime] = useState();
 
-  const senderUserName = data.user.user_name;
-  const senderWorkerName = data.worker.worker_name;
-  const workerData = data.worker
-  const userData = data.user
+  const user_id = data.user_id;
+  const worker_id = data.worker_id;
+  const chat_id = data.chat_id;
+  const userData = data.user;
+  const workerData = data.worker;
+  const user_name = userData.user_name;
+  const worker_name = workerData.worker_name;
+  const worker_photo = workerData.avatar;
+
+  const userIsWorker = profileUserId === worker_id;
 
   const messagesRef = firestore()
-  .collection(`messages/task/${data.id}`)
-  // const messageArrayLength = data.messages.length;
-  // const lastMessage = data.messages[messageArrayLength-1] ? data.messages[messageArrayLength-1].message : "";
-  // const lastMessageTime = data.messages[messageArrayLength-1] ? (data.messages[messageArrayLength-1].timestamp).slice(-20, ) : "";
-
-  useEffect(() => {
-    getMessages()
-  }, [updatedMessage])
-  // console.log(data)
-  const messageId = data.message_id;
+  .collection(`messages/chat/${chat_id}`)
 
   const formattedMessageDate = fdate =>
   fdate == null
     ? ''
-    : format(fdate, "dd'/'MMM'/'yyyy HH:mm", { locale: ptBR });
+    : format(fdate, "MMM'/'dd'/'yyyy HH:mm", { locale: enUS });
 
-
+  useEffect(() => {
+    getMessages()
+    console.log(user_name)
+  }, [updatedMessage])
 
   async function getMessages() {
-    // const messageResponse = await api.get(`messages/${messageId}`)
-    // setMessage(messageResponse.data)
-    // setMessageBell(messageResponse.data.messages)
-
-    // const messagesLength = messageResponse.data.messages.length
-    // console.log(messagesLength)
-
-    // const last_message = messageResponse.data.messages[0]
-    //   ? messageResponse.data.messages[messagesLength-1].message
-    //   : null
-    // setLastMessage(last_message)
-
-    // const last_message_time = messageResponse.data.messages[0]
-    //   ? messageResponse.data.messages[messagesLength-1].timestamp
-    //   : null
-    // setLastMessageTime(last_message_time)
-
     const unsubscribe = messagesRef
       .orderBy('createdAt')
       .onSnapshot((querySnapshot) => {
         const data = querySnapshot.docs.map(d => ({
           ...d.data(),
         }));
-        // console.log(data)
-        // setMessage(messageResponse.data)
         setMessageBell(data)
         let messagesLength = data.length
 
@@ -92,13 +78,20 @@ export default function Messages({ data, navigation }) {
           ? data[messagesLength-1].timestamp
           : null
         setLastMessageTime(last_message_time)
-        // console.log(last_message_time)
         // lastMessageRef.current.scrollToEnd({ animated: false })
       })
       return unsubscribe;
   }
 
   async function handleMessageConversation() {
+    const response = await api.get('/messages', {
+      params: {
+        user_id: profileUserId,
+        worker_id: userIsWorker ? user_id : worker_id,
+      },
+    })
+    // console.log(response.data)
+
     messagesRef
       .orderBy('createdAt')
       .get().then(resp => {
@@ -112,52 +105,23 @@ export default function Messages({ data, navigation }) {
     let editedMessages = messageBell;
     if (forwardValue) {
       const message_id = Math.floor(Math.random() * 1000000)
-      // editedMessages.push({
-      //   "id": message_id,
-      //   "message": forwardValue,
-      //   "sender": `${userIsWorker ? 'worker' : 'user'}`,
-      //   "user_read": `${userIsWorker ? false : true }`,
-      //   "worker_read": `${userIsWorker ? true : false }`,
-      //   "timestamp": formattedMessageDate(new Date()),
-      //   "forward_message": true,
-      // })
       newMessage = {
+        createdAt: firestore.FieldValue.serverTimestamp(),
+        forward_message: true,
         id: message_id,
         message: forwardValue,
-        sender: `${userIsWorker ? "worker" : "user"}`,
-        user_read: userIsWorker ? false : true,
-        worker_read: userIsWorker ? true : false,
-        timestamp: formattedMessageDate(new Date()),
+        receiver_id: response.data.inverted ? user_id : worker_id,
         reply_message: '',
         reply_sender: '',
-        forward_message: true,
+        sender: `${response.data.inverted ? "worker" : "user"}`,
+        timestamp: formattedMessageDate(new Date()),
+        user_read: response.data.inverted ? false : true,
         visible: true,
-        createdAt: firestore.FieldValue.serverTimestamp(),
+        worker_read: response.data.inverted ? true : false,
       }
 
       await messagesRef
       .doc(`${message_id}`).set(newMessage)
-      .then(() => {
-        // console.log(userIsWorker)
-        if (userIsWorker) {
-          api.put(`messages/${messageId}/worker`, {
-            messages: newMessage,
-            task_id: data.id,
-            task_name: data.name,
-            user_id: messageUserId,
-            user_name: user.user_name,
-            worker_id: messageWorkerId,
-          });
-        } else {
-          api.put(`messages/${messageId}/user`, {
-            messages: newMessage,
-            task_id: data.id,
-            task_name: data.name,
-            user_id: messageUserId,
-            user_name: user.user_name,
-          });
-        }
-      })
       .catch((error) => {
         console.log("Error writing document: ", error);
       });
@@ -166,40 +130,56 @@ export default function Messages({ data, navigation }) {
       dispatch(updateForwardMessage(null));
     }
 
-    if (userIsWorker) {
-      editedMessages.map((m) => {
-        if(m.worker_read === false) {
-          m.worker_read = true;
-        }
-        return m
-      })
-    } else {
-      editedMessages.map((m) => {
-        if(m.user_read === false) {
-          m.user_read = true;
-        }
-        return m
-      })
-    }
+    // if (userIsWorker) {
+    //   editedMessages.map((m) => {
+    //     if(m.worker_read === false) {
+    //       m.worker_read = true;
+    //     }
+    //     return m
+    //   })
+    // } else {
+    //   editedMessages.map((m) => {
+    //     if(m.user_read === false) {
+    //       m.user_read = true;
+    //     }
+    //     return m
+    //   })
+    // }
 
     // await api.put(`messages/update/${data.message_id}`, {
     //   messages: editedMessages,
     // })
     // dispatch(updateMessagesRequest(new Date()))
+    if(response.data.inverted) {
+      navigation.navigate('MessagesConversationPage', {
+        // id: data.id,
+        user_id: worker_id,
+        user_name: worker_name,
+        userData: workerData,
+        worker_id: user_id,
+        worker_name: user_name,
+        workerData: userData,
+        avatar: userData.avatar,
+        chat_id: chat_id,
+        inverted: response.data.inverted,
+      });
+      return
+    }
 
     navigation.navigate('MessagesConversationPage', {
-      id: data.id,
-      user_id: data.user.id,
-      user_name: data.user.user_name,
-      worker_id: data.worker.id,
-      worker_name: data.worker.worker_name,
-      worker_phonenumber: data.workerphonenumber,
-      message_id: data.message_id,
-      messages: messageBell,
-      avatar: workerData.avatar,
+      // id: data.id,
+      user_id: user_id,
+      user_name: user_name,
+      userData: userData,
+      worker_id: worker_id,
+      worker_name: worker_name,
+      workerData: workerData,
+      chat_id: chat_id,
+      avatar: worker_photo,
+      inverted: response.data.inverted,
+
     });
     setResetConversation();
-
   }
 
   const hasUnread = (array) => {
@@ -232,60 +212,38 @@ export default function Messages({ data, navigation }) {
     <>
       <TouchableOpacity onPress={handleMessageConversation}>
         <Container>
-          { (userIsWorker)
-            ? (
-              <LeftDoubleView>
-                <AlignView>
-                  { userData === undefined || userData.avatar === null
-                    ? (
-                      <WorkerImageBackgroundView>
-                        <Image/>
-                        {/* <SenderText>Hi</SenderText> */}
-                      </WorkerImageBackgroundView>
-                    )
-                    : (
-                      <WorkerImageBackgroundView>
-                        <Image source={{ uri: userData.avatar.url }}/>
-                      </WorkerImageBackgroundView>
-                    )
-                  }
-                </AlignView>
-              </LeftDoubleView>
-            )
-            : (
-              <LeftView>
-                <AlignView>
-                  { workerData === undefined || workerData.avatar === null
-                    ? (
-                      <UserImageBackgroundView>
-                        <Image/>
-                        {/* <SenderText>Hello</SenderText> */}
-                      </UserImageBackgroundView>
+          <LeftView>
+            <AlignView>
+              { workerData === undefined || workerData.avatar === null
+                ? (
+                  <WorkerImageBackgroundView>
+                    <Image/>
+                    {/* <SenderText>Hello</SenderText> */}
+                  </WorkerImageBackgroundView>
 
-                    )
-                    : (
-                      <UserImageBackgroundView>
-                        <Image source={{ uri: workerData.avatar.url }}/>
-                      </UserImageBackgroundView>
-                    )
-                  }
-                </AlignView>
-              </LeftView>
-            )
-          }
+                )
+                : (
+                  <WorkerImageBackgroundView>
+                    <Image source={{ uri: workerData.avatar.url }}/>
+                  </WorkerImageBackgroundView>
+                )
+              }
+            </AlignView>
+          </LeftView>
+
           <BodyView>
             <MainView>
               <TitleView>
-                {/* <TitleWrapper>
-                  <TitleIcon name="clipboard" colorProp={worker_id === data.worker_id}/>
-                  <TitleText colorProp={worker_id === data.worker_id}>{data.name}</TitleText>
-                </TitleWrapper> */}
-                { (worker_id === data.worker_id)
+                { (userIsWorker)
                   ? (
-                    <SenderText>{senderUserName}</SenderText>
+                    <SenderText>
+                      {userData.user_name}
+                    </SenderText>
                   )
                   : (
-                    <SenderText>{senderWorkerName}</SenderText>
+                    <SenderText>
+                      {workerData.worker_name}
+                    </SenderText>
                   )
                 }
               </TitleView>

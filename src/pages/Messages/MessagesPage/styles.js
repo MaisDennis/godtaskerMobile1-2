@@ -46,6 +46,7 @@ export const List = styled.FlatList.attrs({
   contentContainerStyle: { padding: 0, margin: 0 },
 })`
   height: 100%;
+  /* background-color: #f5f; */
 `;
 
 export const SearchBarTextInput = styled.TextInput`
@@ -55,6 +56,24 @@ export const SearchBarTextInput = styled.TextInput`
   padding: 4px 12px;
   margin: 0 auto;
   background-color: #ddd;
+`;
+
+export const TestText = styled.Text`
+  font-weight: bold;
+  font-size: ${Platform.OS === 'ios' ? '13px' : '12px'};
+  color: #999;
+  margin: 12px auto 0;
+`;
+
+export const TestView = styled.View`
+display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 42px; /* maintain in px. */
+  width: 100%;
+  background-color: #fff;
+  /* background-color: #f5f; */
 `;
 
 export const Title = styled.Text`

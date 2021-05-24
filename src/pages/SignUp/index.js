@@ -16,7 +16,6 @@ import {
   IconView,
   LabelText,
   // ImageGodtaskerFont, ImageLogo,
-  Options,
   PhoneMask,
   RadioButtonView, RadioButtonTag,
   RadioButtonLabel, RadioButtonOuter, RadioButtonInner0,
@@ -125,7 +124,7 @@ export default function SignUp({ navigation, route }) {
         firstName, lastName, userName, password,
         parsedPhonenumber, email, birthDate, gender
       ));
-      navigation.goBack();
+      // navigation.goBack();
     }
     catch (error) {
       Alert.alert(

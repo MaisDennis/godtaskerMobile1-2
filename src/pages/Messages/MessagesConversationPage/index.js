@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
 import {
-  FlatList, KeyboardAvoidingView, SafeAreaView, TouchableOpacity
+  FlatList, SafeAreaView, TouchableOpacity
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR, enUS } from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 // -----------------------------------------------------------------------------
 import {
@@ -15,10 +15,10 @@ import {
   Header, HrDivider, HrLine,
   Image, ImageBackgroundView,
   LineView,
-  MessageView, MessageText, MessageContainer,
+  MessageText, MessageContainer,
   MessageWrapper, MessageListView, MessageListItemView,
   MessageListItemText, MessageListButton, MessageTime, MessageIcon,
-  MessageBottomView,
+  MessageBottomView, MessageView, MessageViewUser,
   // ParsedKeyboardAvoidingView,
   ReplyContainer, ReplyView, ReplyOnTopView, ReplyNameText, ReplyOnTopText,
   SendInput, SendButton, SendButtonView,
@@ -31,72 +31,58 @@ import api from '~/services/api';
 import { updateMessagesRequest, updateForwardMessage } from '~/store/modules/message/actions';
 // import messaging from '@react-native-firebase/messaging';
 
-
 export default function MessagesConversationPage({ navigation, route }) {
   const userId = useSelector(state => state.user.profile.id);
-  // const user = useSelector(state => state.user.profile);
   const messageWorkerId = route.params.worker_id;
+  const messageWorkerData = route.params.workerData;
   const messageUserId = route.params.user_id;
-  const userIsWorker = userId === messageWorkerId;
+  const messageUserData = route.params.userData;
+  const chat_id = route.params.chat_id;
+  const inverted = route.params.inverted;
 
   const dispatch = useDispatch();
-
-  // const [messages, setMessages] = useState(route.params.messages);
-  // const [defaultMessages, setDefaultMessages] = useState(route.params.messages);
   const [messages, setMessages] = useState([]);
-  const [defaultMessages, setDefaultMessages] = useState();
+  // const [defaultMessages, setDefaultMessages] = useState();
 
+  const [firstMessage, setFirstMessage] = useState(route.params.first_message);
   const [replyValue, setReplyValue] = useState();
   const [replySender, setReplySender] = useState();
   const [value, setValue] = useState();
   const [messageDropMenu, setMessageDropMenu] = useState();
   const [toggleDropMenu, setToggleDropMenu] = useState(false);
-  const [workerData, setWorkerData] = useState();
   const [load, setLoad] = useState();
   const lastMessageRef = useRef()
 
-  const messageId = route.params.message_id;
   const task = route.params;
-  const worker_phonenumber = route.params.worker_phonenumber
+  // const worker_phonenumber = route.params.worker_phonenumber
+
+  const chatId = route.params.chat_id;
 
   const messagesRef = firestore()
-    .collection(`messages/task/${task.id}`)
+  .collection(`messages/chat/${chatId}`)
 
   const formattedMessageDate = fdate =>
   fdate == null
     ? ''
-    : format(fdate, "dd'/'MMM'/'yyyy HH:mm", { locale: ptBR });
+    : format(fdate, "MMM'/'dd'/'yyyy HH:mm", { locale: enUS });
 
   useEffect(() => {
-    getPhoto(worker_phonenumber)
-    // setMessages(route.params.messages)
     getMessages()
+
   }, []);
 
-  function getMessages() {
-    // const response = await api.get(`messages/${task.message_id}`)
-    // setMessages(response.data.messages)
-    // setDefaultMessages(response.data.messages)
-
+  async function getMessages() {
     const unsubscribe = messagesRef
-      .orderBy('createdAt')
-      .onSnapshot((querySnapshot) => {
-        const data = querySnapshot.docs.map(d => ({
-          ...d.data(),
-        }));
-        // console.log(data)
-        setMessages(data)
-        setDefaultMessages(data)
-        // lastMessageRef.current.scrollToEnd({ animated: false })
-      })
-      return unsubscribe;
-  }
-
-  async function getPhoto(phonenumber) {
-    const worker = await api.get('workers/individual', {
-      params: {phonenumber: phonenumber},
+    .orderBy('createdAt')
+    .onSnapshot((querySnapshot) => {
+      const data = querySnapshot.docs.map(d => ({
+        ...d.data(),
+      }));
+      setMessages(data)
+      // setDefaultMessages(data)
     })
-    setWorkerData(worker.data)
+    await lastMessageRef.current.scrollToEnd();
+    return unsubscribe;
   }
 
   async function handleSend() {
@@ -105,71 +91,85 @@ export default function MessagesConversationPage({ navigation, route }) {
       let newMessage = null
       let formattedTimeStamp = formattedMessageDate(new Date())
       const message_id = Math.floor(Math.random() * 1000000)
-      // const message_id = messages.length
       if (replyValue) {
         newMessage = {
+          createdAt: firestore.FieldValue.serverTimestamp(),
+          forward_message: false,
           id: message_id,
           message: value,
-          sender: `${userIsWorker ? "worker" : "user"}`,
-          user_read: userIsWorker ? false : true,
-          worker_read: userIsWorker ? true : false,
-          timestamp: formattedTimeStamp,
+          receiver_id: inverted ? messageUserId : messageWorkerId,
           reply_message: replyValue,
           reply_sender: replySender,
-          forward_message: false,
+          sender: `${inverted ? "worker" : "user"}`,
+          sender_id: userId,
+          timestamp: formattedTimeStamp,
+          user_read: inverted ? false : true,
           visible: true,
-          createdAt: firestore.FieldValue.serverTimestamp(),
+          worker_read: inverted ? true : false,
         }
       } else {
         newMessage = {
+          createdAt: firestore.FieldValue.serverTimestamp(),
+          forward_message: false,
           id: message_id,
           message: value,
-          sender: `${userIsWorker ? "worker" : "user"}`,
-          user_read: userIsWorker ? false : true,
-          worker_read: userIsWorker ? true : false,
-          timestamp: formattedTimeStamp,
+          receiver_id: inverted ? messageUserId : messageWorkerId,
           reply_message: '',
           reply_sender: '',
-          forward_message: false,
+          sender: `${inverted ? "worker" : "user"}`,
+          sender_id: userId,
+          timestamp: formattedTimeStamp,
+          user_read: inverted ? false : true,
           visible: true,
-          createdAt: firestore.FieldValue.serverTimestamp(),
+          worker_read: inverted ? true : false,
         }
       }
+
       // Firebase Messaging *****
       await messagesRef
       .doc(`${message_id}`).set(newMessage)
       .then(() => {
-        // console.log(userIsWorker)
-        if (userIsWorker) {
-          api.put(`messages/${messageId}/worker`, {
-            messages: newMessage,
-            task_id: task.id,
-            task_name: task.name,
+        // console.log(firstMessage)
+        if(firstMessage === true) {
+          api.post('/messages', {
             user_id: messageUserId,
-            user_name: user.user_name,
             worker_id: messageWorkerId,
+            chat_id: chat_id,
           });
-        } else {
-          api.put(`messages/${messageId}/user`, {
-            messages: newMessage,
-            task_id: task.id,
-            task_name: task.name,
-            user_id: messageUserId,
-            user_name: user.user_name,
-          });
+          dispatch(updateMessagesRequest(new Date()))
+          setFirstMessage(false);
+          return
         }
+
+        api.put(`/messages/${chat_id}`, {
+          messaged_at: JSON.stringify(new Date()),
+        })
+        dispatch(updateMessagesRequest(new Date()))
+
+        // if (userIsWorker) {
+        //   api.put(`messages/${messageId}/worker`, {
+        //     messages: newMessage,
+        //     task_id: task.id,
+        //     task_name: task.name,
+        //     user_id: messageUserId,
+        //     user_name: user.user_name,
+        //     worker_id: messageWorkerId,
+        //   });
+        // } else {
+        //   api.put(`messages/${messageId}/user`, {
+        //     messages: newMessage,
+        //     task_id: task.id,
+        //     task_name: task.name,
+        //     user_id: messageUserId,
+        //     user_name: user.user_name,
+        //   });
+        // }
       })
       .catch((error) => {
         console.log("Error writing document: ", error);
       });
-
-      await api.put(`tasks/${task.id}`, {
-        messaged_at: new Date(),
-      })
-
       setValue();
       setReplyValue();
-      lastMessageRef.current.scrollToEnd();
       setLoad(false)
     }
     catch(error) {
@@ -206,107 +206,245 @@ export default function MessagesConversationPage({ navigation, route }) {
   }
   // ---------------------------------------------------------------------------
   const renderItem = ({ item, index }) => (
-    <AlignView key={item.id} sender={item.sender} userIsWorker={userIsWorker}>
+    <AlignView key={item.id}>
       <LineView>
-        <MessageContainer sender={item.sender} userIsWorker={userIsWorker}>
-          { userIsWorker
-            ? (
-              <MessageWrapper>
-                { item.sender === 'worker' && (
-                  <MessageTime>{item.timestamp}</MessageTime>
-                )}
-                <MessageView sender={item.sender}>
-                  { item.reply_message && !item.removed_message
-                    ? (
-                      <ReplyOnTopView>
-                        { item.reply_sender === 'worker'
-                          ? (
-                            <ReplyNameText>{task.worker_name}</ReplyNameText>
-                          )
-                          : (
-                            <ReplyNameText>{task.user_name}</ReplyNameText>
-                          )
-                        }
-                        <ReplyOnTopText>{item.reply_message}</ReplyOnTopText>
-                      </ReplyOnTopView>
-                    )
+        <MessageContainer sender={item.sender} inverted={inverted}>
+          <MessageWrapper>
+            { !inverted
+              ? (
+                <>
+                  { item.sender === 'user'
+                    ? (<MessageTime>{item.timestamp}</MessageTime>)
                     : null
                   }
-                  { item.forward_message && !item.removed_message
+                </>
+              )
+              : (
+                <>
+                  { item.sender === 'worker'
+                    ? (<MessageTime>{item.timestamp}</MessageTime>)
+                    : null
+                  }
+                </>
+              )
+            }
+            { !inverted
+              ? (
+                <>
+                  { item.sender === 'user'
                     ? (
-                      <ForwardOnTopView>
-                        <MessageIcon name='corner-down-right'/>
-                        <ForwardText>Mens. encaminhada</ForwardText>
-                      </ForwardOnTopView>
+                      <MessageViewUser
+                        sender={item.sender}
+                        // colors={['#2EFFFF', '#FC56FF']}
+                        colors={['#fff', '#FC56FF']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0, y: 1 }}
+                      >
+                        { item.reply_message && !item.removed_message
+                          ? (
+                            <ReplyOnTopView>
+                              { item.reply_sender === 'worker'
+                                ? (
+                                  <ReplyNameText>{task.worker_name}</ReplyNameText>
+                                )
+                                : (
+                                  <ReplyNameText>{task.user_name}</ReplyNameText>
+                                )
+                              }
+                              <ReplyOnTopText>{item.reply_message}</ReplyOnTopText>
+                            </ReplyOnTopView>
+                          )
+                          : null
+                        }
+                        { item.forward_message && !item.removed_message
+                          ? (
+                            <ForwardOnTopView>
+                              <MessageIcon name='corner-down-right'/>
+                              <ForwardText>Mens. encaminhada</ForwardText>
+                            </ForwardOnTopView>
+                          )
+                          : (
+                            null
+                          )
+                        }
+
+                        <MessageBottomView>
+                          <MessageText removedMessage={item.removed_message}>{item.message}</MessageText>
+                          <TouchableOpacity
+                            onPress={() => handleMessageDropMenu(index)}
+                          >
+                            <MessageIcon name='chevron-down'/>
+                          </TouchableOpacity>
+                        </MessageBottomView>
+                      </MessageViewUser>
                     )
                     : (
-                      null
+                      <MessageView
+                        sender={item.sender}
+                        // colors={['#FBFF2E', '#4BFF2E']}
+                        colors={['#fff', '#4BFF2E']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0, y: 1 }}
+                      >
+                        { item.reply_message && !item.removed_message
+                          ? (
+                            <ReplyOnTopView>
+                              { item.reply_sender === 'worker'
+                                ? (
+                                  <ReplyNameText>{task.worker_name}</ReplyNameText>
+                                )
+                                : (
+                                  <ReplyNameText>{task.user_name}</ReplyNameText>
+                                )
+                              }
+                              <ReplyOnTopText>{item.reply_message}</ReplyOnTopText>
+                            </ReplyOnTopView>
+                          )
+                          : null
+                        }
+                        { item.forward_message && !item.removed_message
+                          ? (
+                            <ForwardOnTopView>
+                              <MessageIcon name='corner-down-right'/>
+                              <ForwardText>Mens. encaminhada</ForwardText>
+                            </ForwardOnTopView>
+                          )
+                          : (
+                            null
+                          )
+                        }
+                        <MessageBottomView>
+                          <MessageText removedMessage={item.removed_message}>{item.message}</MessageText>
+                          <TouchableOpacity
+                            onPress={() => handleMessageDropMenu(index)}
+                          >
+                            <MessageIcon name='chevron-down'/>
+                          </TouchableOpacity>
+                        </MessageBottomView>
+                      </MessageView>
                     )
-
                   }
-                  <MessageBottomView>
-                    <MessageText removedMessage={item.removed_message}>{item.message}</MessageText>
-                    <TouchableOpacity
-                      onPress={() => handleMessageDropMenu(index)}
-                    >
-                      <MessageIcon name='chevron-down'/>
-                    </TouchableOpacity>
-                  </MessageBottomView>
-                </MessageView>
-                { item.sender === 'user' && (
-                  <MessageTime>{item.timestamp}</MessageTime>
-                )}
-              </MessageWrapper>
-            )
-            : (
-              <MessageWrapper>
-              { item.sender === 'user' && (
-                <MessageTime>{item.timestamp}</MessageTime>
-              )}
-              <MessageView sender={item.sender}>
-                { item.reply_message && !item.removed_message
-                  ? (
-                    <ReplyOnTopView>
-                      { item.reply_sender === 'user'
-                        ? (
-                          <ReplyNameText>{task.worker_name}</ReplyNameText>
-                        )
-                        : (
-                          <ReplyNameText>{task.user_name}</ReplyNameText>
-                        )
-                      }
-                      <ReplyOnTopText>{item.reply_message}</ReplyOnTopText>
-                    </ReplyOnTopView>
-                  )
-                  : null
-                }
-                { item.forward_message && !item.removed_message
-                  ? (
-                    <ForwardOnTopView>
-                      <MessageIcon name='corner-down-right'/>
-                      <ForwardText>Mens. encaminhada</ForwardText>
-                    </ForwardOnTopView>
-                  )
-                  : (
-                    null
-                  )
+                </>
+              )
+              : (
+                <>
+                  { item.sender === 'worker'
+                    ? (
+                      <MessageViewUser
+                        sender={item.sender}
+                        // colors={['#2EFFFF', '#FC56FF']}
+                        colors={['#fff', '#FC56FF']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0, y: 1 }}
+                      >
+                        { item.reply_message && !item.removed_message
+                          ? (
+                            <ReplyOnTopView>
+                              { item.reply_sender === 'worker'
+                                ? (
+                                  <ReplyNameText>{task.worker_name}</ReplyNameText>
+                                )
+                                : (
+                                  <ReplyNameText>{task.user_name}</ReplyNameText>
+                                )
+                              }
+                              <ReplyOnTopText>{item.reply_message}</ReplyOnTopText>
+                            </ReplyOnTopView>
+                          )
+                          : null
+                        }
+                        { item.forward_message && !item.removed_message
+                          ? (
+                            <ForwardOnTopView>
+                              <MessageIcon name='corner-down-right'/>
+                              <ForwardText>Mens. encaminhada</ForwardText>
+                            </ForwardOnTopView>
+                          )
+                          : (
+                            null
+                          )
+                        }
 
-                }
-                <MessageBottomView>
-                  <MessageText removedMessage={item.removed_message}>{item.message}</MessageText>
-                  <TouchableOpacity
-                    onPress={() => handleMessageDropMenu(index)}
-                  >
-                    <MessageIcon name='chevron-down'/>
-                  </TouchableOpacity>
-                </MessageBottomView>
-              </MessageView>
-              { item.sender === 'worker' && (
-                <MessageTime>{item.timestamp}</MessageTime>
-              )}
-            </MessageWrapper>
-            )
-          }
+                        <MessageBottomView>
+                          <MessageText removedMessage={item.removed_message}>{item.message}</MessageText>
+                          <TouchableOpacity
+                            onPress={() => handleMessageDropMenu(index)}
+                          >
+                            <MessageIcon name='chevron-down'/>
+                          </TouchableOpacity>
+                        </MessageBottomView>
+                      </MessageViewUser>
+                    )
+                    : (
+                      <MessageView
+                        sender={item.sender}
+                        // colors={['#FBFF2E', '#4BFF2E']}
+                        colors={['#fff', '#4BFF2E']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0, y: 1 }}
+                      >
+                        { item.reply_message && !item.removed_message
+                          ? (
+                            <ReplyOnTopView>
+                              { item.reply_sender === 'worker'
+                                ? (
+                                  <ReplyNameText>{task.worker_name}</ReplyNameText>
+                                )
+                                : (
+                                  <ReplyNameText>{task.user_name}</ReplyNameText>
+                                )
+                              }
+                              <ReplyOnTopText>{item.reply_message}</ReplyOnTopText>
+                            </ReplyOnTopView>
+                          )
+                          : null
+                        }
+                        { item.forward_message && !item.removed_message
+                          ? (
+                            <ForwardOnTopView>
+                              <MessageIcon name='corner-down-right'/>
+                              <ForwardText>Mens. encaminhada</ForwardText>
+                            </ForwardOnTopView>
+                          )
+                          : (
+                            null
+                          )
+                        }
+                        <MessageBottomView>
+                          <MessageText removedMessage={item.removed_message}>{item.message}</MessageText>
+                          <TouchableOpacity
+                            onPress={() => handleMessageDropMenu(index)}
+                          >
+                            <MessageIcon name='chevron-down'/>
+                          </TouchableOpacity>
+                        </MessageBottomView>
+                      </MessageView>
+                    )
+                  }
+                </>
+
+              )
+            }
+            { !inverted
+              ? (
+                <>
+                  { item.sender === 'worker'
+                    ? (<MessageTime>{item.timestamp}</MessageTime>)
+                    : null
+                  }
+                </>
+              )
+              : (
+                <>
+                  { item.sender === 'user'
+                    ? (<MessageTime>{item.timestamp}</MessageTime>)
+                    : null
+                  }
+                </>
+              )
+            }
+          </MessageWrapper>
+
 
           { (messageDropMenu === index) && (toggleDropMenu === true) && (
             <MessageListView>
@@ -342,32 +480,72 @@ export default function MessagesConversationPage({ navigation, route }) {
   return (
     <SafeAreaView>
       <Container>
-        <Header userIsWorker={userIsWorker}>
-          <BodyView>
-              { route.params === undefined || route.params.avatar === null
-                ? (
-                  <ImageBackgroundView userIsWorker={userIsWorker}>
-                    <Image/>
-                  </ImageBackgroundView>
-                )
-                : (
-                  <ImageBackgroundView userIsWorker={userIsWorker}>
-                    <Image
-                      source={{ uri: route.params.avatar.url }}
-                    />
-                  </ImageBackgroundView>
-                )
-              }
-            <SenderView>
-              <SenderText numberOfLines={1}>{route.params.user_name}</SenderText>
-              <SenderAboutText numberOfLines={1}>
-                { route.params.bio
-                  ? route.params.bio
-                  : 'Seja a mudança que queira nesse mundo! Lorem Ipsum Lorem Ipsum Lorem Ipsum'
+        <Header>
+          { inverted
+            ? (
+              <BodyView>
+                { messageUserData === undefined || messageUserData.avatar === null
+                  ? (
+                    <ImageBackgroundView>
+                      <Image/>
+                    </ImageBackgroundView>
+                  )
+                  : (
+                    <ImageBackgroundView>
+                      <Image
+                        source={{ uri: messageUserData.avatar.url}}
+                      />
+                    </ImageBackgroundView>
+                  )
                 }
-              </SenderAboutText>
-            </SenderView>
-          </BodyView>
+                <SenderView>
+                  <SenderText numberOfLines={1}>
+                    { inverted
+                      ? messageWorkerData.worker_name
+                      : messageUserData.user_name
+                    }
+                  </SenderText>
+                  <SenderAboutText numberOfLines={1}>
+                    { route.params.bio
+                      ? route.params.bio
+                      : 'Seja a mudança que queira nesse mundo! Lorem Ipsum Lorem Ipsum Lorem Ipsum'
+                    }
+                  </SenderAboutText>
+                </SenderView>
+              </BodyView>
+            )
+            : (
+              <BodyView>
+                { messageWorkerData === undefined || messageWorkerData.avatar === null
+                  ? (
+                      <ImageBackgroundView>
+                        <Image/>
+                      </ImageBackgroundView>
+                  )
+                  : (
+                    <ImageBackgroundView>
+                      <Image
+                        source={{ uri: messageWorkerData.avatar.url}}
+                      />
+                    </ImageBackgroundView>
+                  )
+                }
+                <SenderView>
+                  <SenderText numberOfLines={1}>
+                    {messageWorkerData.worker_name}
+                  </SenderText>
+                  <SenderAboutText numberOfLines={1}>
+                    { route.params.bio
+                      ? route.params.bio
+                      : 'Seja a mudança que queira nesse mundo! Lorem Ipsum Lorem Ipsum Lorem Ipsum'
+                    }
+                  </SenderAboutText>
+                </SenderView>
+              </BodyView>
+            )
+
+          }
+
         </Header>
         <HrDivider/>
         <ConversationView>
@@ -406,7 +584,7 @@ export default function MessagesConversationPage({ navigation, route }) {
                   returnKeyType="send"
                   value={value}
                   onChangeText={setValue}
-                  placeholder="Escrever a sua mensagem"
+                  placeholder="Write your message"
               />
               {/* keep "if else" below */}
               { value
@@ -424,15 +602,6 @@ export default function MessagesConversationPage({ navigation, route }) {
             </ReplyView>
           </ReplyContainer>
         </ConversationView>
-
-        {/* <ParsedKeyboardAvoidingView
-          // keyboardVerticalOffset={10}
-          // behavior={Platform.OS === "ios" ? "padding" : "height"}
-          // behavior="height"
-          behavior="position"
-          // behavior='padding'
-        > */}
-        {/* </ParsedKeyboardAvoidingView> */}
       </Container>
     </SafeAreaView>
   )

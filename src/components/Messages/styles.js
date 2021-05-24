@@ -111,24 +111,6 @@ export const SenderText = styled.Text`
 
 export const TitleView = styled.View``;
 
-export const TitleWrapper = styled.View`
-display: flex;
-flex-direction: row;
-align-items: center;
-width: 90%;
-`;
-
-export const TitleIcon = styled(Icon)`
-  font-size: 18px;
-  color: ${props => props.colorProp == true ? '#334466' : '#009966'};
-`;
-
-export const TitleText = styled.Text`
-  color: #4433ee;
-  font-weight: 700;
-  padding: 4px;
-  color: ${props => props.colorProp == true ? '#334466' : '#009966'};
-`;
 
 export const UnreadMessageCountView = styled.View`
   display: flex;
@@ -141,18 +123,6 @@ export const UnreadMessageCountView = styled.View`
   border-width: 1px;
   border-color: #ccc;
   /* background-color: #fff; */
-`;
-
-export const UserImageBackgroundView = styled.View`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 52px;
-  width: 52px;
-  border-radius: 52px;
-  border-width: 1px;
-  border-color: #009966;
-  background-color: #fff;
 `;
 
 export const UnreadMessageCountText = styled.Text`

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, TouchableOpacity } from 'react-native'
+import { Alert, TouchableOpacity, Text, View } from 'react-native'
 import { useSelector } from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
 import { Swipeable } from 'react-native-gesture-handler';
@@ -10,8 +10,8 @@ import {
   Header, HeaderTabView, HeaderTouchable,
   List,
   SearchBarTextInput,
+  // TestText, TestView,
   Title,
-  // UpperTabView, UpperTabText,
 } from './styles';
 import Messages from '~/components/Messages';
 import api from '~/services/api';
@@ -22,16 +22,26 @@ export default function MessagesPage({ navigation, route }) {
   const workerID = useSelector(state => state.worker.profile.id);
   const messages_update = useSelector(state => state.message.profile);
 
-  const [tasks, setTasks] = useState([]);
   const [messages, setMessages] = useState([]);
   const [defaultMessages, setDefaultMessages] = useState();
   const [defaultTasks, setDefaultTasks] = useState();
   const [inputState, setInputState] = useState();
-  const [resetTasks, setResetTasks] = useState('Hello');
-  // console.log(route)
+  const [lastMessageTime, setLastMessageTime] = useState();
+
   useEffect(() => {
-    loadTasks('', user_id);
+    // loadTasks('', user_id);
+    loadMessages()
   }, [ messages_update ]);
+
+    async function loadMessages() {
+      const messagesResponse = await api.get(`messages/${user_id}`)
+      const Data = messagesResponse.data
+      Data.sort(compare);
+
+      setMessages(Data)
+      setDefaultMessages(Data)
+    }
+
 
     async function loadTasks(workerNameFilter, userID) {
     let response = []
@@ -61,14 +71,6 @@ export default function MessagesPage({ navigation, route }) {
     setDefaultTasks(filteredResponse);
   }
 
-  async function getPhoto(phonenumber) {
-    const worker = await api.get('workers/individual', {
-      params: {phonenumber: phonenumber},
-    })
-    setWorkerData(worker.data)
-    // console.log('worker')
-  }
-
   function compare(a, b) {
     if (a.messaged_at > b.messaged_at) {
       return -1;
@@ -80,11 +82,11 @@ export default function MessagesPage({ navigation, route }) {
   }
 
   const handleUpdateInput = async (input) => {
-    const filteredList = defaultTasks.filter(t => {
+    const filteredList = defaultMessages.filter(t => {
       let messageSearch = t.name + t.worker.worker_name
       return messageSearch.toLowerCase().includes(input.toLowerCase())
     })
-    setTasks(filteredList)
+    setMessages(filteredList)
     setInputState(input)
   }
 
@@ -102,7 +104,10 @@ export default function MessagesPage({ navigation, route }) {
           onChangeText={handleUpdateInput}
           value={inputState}
         />
-        <HeaderTouchable onPress={() => loadTasks('', user_id)}>
+        <HeaderTouchable
+          // onPress={() => loadTasks('', user_id)}
+          onPress={() => loadMessages()}
+        >
           <AddIcon name='refresh-cw' size={21}/>
         </HeaderTouchable>
       </Header>
@@ -113,29 +118,33 @@ export default function MessagesPage({ navigation, route }) {
           </TouchableOpacity>
         </UpperTabView>
       </HeaderTabView> */}
-      { tasks == ''
+      { messages == ''
         ? (
           <Title>Não há conversas em aberto.</Title>
         )
         : (
-          <List
-            data={tasks}
-            keyExtractor={item => String(item.id)}
-            renderItem={({ item, index }) => (
-              <Swipeable
-                renderLeftActions={LeftActions}
-                onSwipeableLeftOpen={() => Alert.alert('Hi')}
-              >
-              <Messages
-                key={index}
-                data={item}
-                navigation={navigation}
-                resetTasks={resetTasks}
-                setResetTasks={setResetTasks}
-              />
-              </Swipeable>
-            )}
-          />
+          <>
+            <List
+              // data={tasks}
+              data={messages}
+              keyExtractor={item => String(item.id)}
+              renderItem={({ item, index }) => (
+                <Swipeable
+                  renderLeftActions={LeftActions}
+                  onSwipeableLeftOpen={() => Alert.alert('Hi')}
+                >
+                  {/* <TestView styles={{backgroundColor: '#999'}}>
+                    <TestText>2222222</TestText>
+                  </TestView> */}
+                <Messages
+                  key={index}
+                  data={item}
+                  navigation={navigation}
+                />
+                </Swipeable>
+              )}
+            />
+          </>
         )
       }
     </Container>

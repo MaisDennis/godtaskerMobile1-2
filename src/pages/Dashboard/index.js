@@ -1,46 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { Text, TouchableOpacity, SafeAreaView } from 'react-native'
+import { Alert } from 'react-native'
 import { useSelector } from 'react-redux';
 import { format } from 'date-fns';
 import pt from 'date-fns/locale/pt';
+import Modal from 'react-native-modal';
 // -----------------------------------------------------------------------------
 import {
   AddIcon,
   BioText, BlockLarge, BlockLargeBoss,
   BlockLargeWorker, BlockSegment, BlockSmallBoss, BlockSmallWorker,
-  Container, ContentView,
+  ButtonText, ButtonView,
+  CheckBoxWrapper, Container, ContentView,
   DateText,
-  FollowersView, FormScrollView,
+  FirstNameWrapper, FollowersView, FollowersWrapper, FormScrollView,
   Header, HeaderImage, HeaderTabView, HeaderTouchable, HrLine,
-  Iicon,
-  Label, LabelBold, LabelBoldBoss, LabelBoldBoss2, LabelBoldRed,
-  LabelNormal, LabelNormalBoss, LabelNormalWorker,
-  LabelSmallBoss, LabelSmallBoss2, LabelSmallRed, LabelSmallWorker, LabelSmallWorker2,
+  Iicon, Input,
+  Label, LabelBold, LabelBold2, LabelBoldBoss,
+  LabelBoldBoss2, LabelBoldRed, LabelBoldSocialMedia,
   LabelBoldWorker, LabelBoldWorker2,
-  SearchBarTextInput, SpaceView, StatusCircleBoss, StatusCircleRed,
-  StatusCircleWorker, StatusView, StatusLineBoss, StatusLineWorker,
-  SocialMediaView,
-  UserNameText, UserView,
-  UserProfileView, UserImageBackgroundView, UserImage,
+  LabelNormal, LabelNormalBoss, LabelNormalSocialMedia,
+  LabelNormalWorker,
+  LabelSmallBoss, LabelSmallBoss2, LabelSmallRed,
+  LabelSmallWorker, LabelSmallWorker2, LinkedInWrapper,
+  ModalView,
+  SearchBarTextInput, SocialMediaButton, SocialMediaView,
+  SocialMediaWrapper, SpaceView,
+  StatusCircleBoss, StatusCircleRed, StatusCircleWorker,
+  StatusLineBoss, StatusLineWorker, StatusView,
+  UserImage, UserImageBackgroundView, UserInfoView,
+  UserNameText, UserProfileView, UserView,
 } from './styles'
-import Settings from '~/pages/Settings';
-import HeaderView from '~/components/HeaderView'
 import logo from '~/assets/detective/detective_remake.png'
-import Contacts from '~/components/Contacts'
 import api from '~/services/api';
 
 export default function Dashboard({ navigation }) {
-  const user = useSelector(state => state.user.profile);
   const user_id = useSelector(state => state.user.profile.id);
   const user_name = useSelector(state => state.user.profile.user_name);
-  const user_photo = useSelector(state => state.user.profile.avatar.url);
+  const user_phonenumber = useSelector(state => state.user.profile.phonenumber);
 
-  const worker = useSelector(state => state.worker.profile);
+  // const first_name = useSelector(state => state.user.profile.first_name);
+  // const last_name = useSelector(state => state.user.profile.last_name);
+  const user_photo = useSelector(state => state.user.profile.avatar) || null;
+  const user_instagram = useSelector(state => state.user.profile.instagram);
   const worker_id = useSelector(state => state.worker.profile.id);
+  // const instagram_username = '@mais.dennis'
+  // const linkedin_username = '/dennisdjlee/'
+
+  const [userFirstName, setUserFirstName] = useState();
+  const [userLastName, setUserLastName] = useState();
+  const [userUserName, setUserUserName] = useState();
+  const [userPhoto, setUserPhoto] = useState();
+  const [userInstagram, setUserInstagram] = useState();
+  const [userLinkedIn, setUserLinkedIn] = useState();
+  const [userBio, setUserBio] = useState();
+
+  const [toggleInstagram, setToggleInstagram] = useState();
+  const [toggleLinkedIn, setToggleLinkedIn] = useState();
+  const [toggleBio, setToggleBio] = useState();
 
   const [countFollowers, setCountFollowers] = useState();
-  const [countFollowing, setCountFollowing] = useState();
-
+  // const [countFollowing, setCountFollowing] = useState();
   const [userCountSent, setUserCountSent] = useState();
   const [userCountInitiated, setUserCountInitiated] = useState();
   const [userCountFinished, setUserCountFinished] = useState();
@@ -61,13 +80,15 @@ export default function Dashboard({ navigation }) {
   useEffect(() => {
     loadData()
   }, [])
+
   const formattedDate = fdate =>
   fdate == null
     ? '-'
     : format(fdate, "dd 'de' MMMM',' yyyy", { locale: pt });
-  // const todayDate = formattedDate(new Date())
 
   async function loadData() {
+    const user = await api.get(`users/${user_id}`)
+
     const userResponse = await api.get('/tasks/user/count', {
       params: {
         userID: user_id,
@@ -83,9 +104,17 @@ export default function Dashboard({ navigation }) {
     const followingResponse = await api.get(`/users/${user_id}/following/count`)
     const followedResponse = await api.get(`/workers/${worker_id}/followed/count`)
 
-    // console.tron.log(followingResponse.data)
+    // console.log(user.data)
+    setUserFirstName(user.data.first_name)
+    setUserLastName(user.data.last_name)
+    setUserUserName(user.data.user_name)
+    setUserPhoto(user.data.avatar)
+    setUserInstagram(user.data.instagram)
+    setUserLinkedIn(user.data.linkedin)
+    setUserBio(user.data.bio)
+
     setCountFollowers(followedResponse.data)
-    setCountFollowing(followingResponse.data)
+    // setCountFollowing(followingResponse.data)
     setUserCountSent(userResponse.data.countSent)
     setUserCountInitiated(userResponse.data.countInitiated)
     setUserCountFinished(userResponse.data.countFinished)
@@ -104,6 +133,10 @@ export default function Dashboard({ navigation }) {
     setWorkerCountThisWeekDue(workerResponse.data.countThisWeekDue)
   }
 
+  function handleRefresh() {
+    loadData()
+  }
+
   function handleFollow() {
     navigation.navigate('Follow')
   }
@@ -112,6 +145,104 @@ export default function Dashboard({ navigation }) {
     navigation.navigate('Settings');
   }
 
+  function handleToggleInstagram() {
+    setToggleInstagram(!toggleInstagram)
+  }
+
+  function handleToggleLinkedIn() {
+    setToggleLinkedIn(!toggleLinkedIn)
+  }
+
+  function handleToggleBio() {
+    setToggleBio(!toggleBio)
+  }
+
+  async function handleInstagramSubmit() {
+    setToggleInstagram(!toggleInstagram)
+    try {
+      await api.put('users/no-photo', {
+        phonenumber: user_phonenumber,
+        instagram: userInstagram,
+      })
+
+      await api.put('workers/no-photo', {
+        phonenumber: user_phonenumber,
+        instagram: userInstagram,
+      })
+      Alert.alert(
+        'Success!',
+        'Instagram Username updated',
+        [{ style: "default" }],
+        { cancelable: true },
+      )
+    }
+    catch {
+      Alert.alert(
+        'Update Failed',
+        'Instagram Username not updated. Please try again or contact Support',
+        [{ style: "default" }],
+        { cancelable: true },
+      )
+    }
+  }
+
+  async function handleLinkedInSubmit() {
+    setToggleLinkedIn(!toggleLinkedIn)
+    try {
+      await api.put('users/no-photo', {
+        phonenumber: user_phonenumber,
+        linkedin: userLinkedIn,
+      })
+
+      await api.put('workers/no-photo', {
+        phonenumber: user_phonenumber,
+        linkedin: userLinkedIn,
+      })
+      Alert.alert(
+        'Success!',
+        'LinkedIn Username updated',
+        [{ style: "default" }],
+        { cancelable: true },
+      )
+    }
+    catch {
+      Alert.alert(
+        'Update Failed',
+        'LinkedIn Username not updated. Please try again or contact Support',
+        [{ style: "default" }],
+        { cancelable: true },
+      )
+    }
+  }
+
+  async function handleBioSubmit() {
+    setToggleBio(!toggleBio)
+    try {
+      await api.put('users/no-photo', {
+        phonenumber: user_phonenumber,
+        bio: userBio,
+      })
+
+      await api.put('workers/no-photo', {
+        phonenumber: user_phonenumber,
+        bio: userBio,
+      })
+      Alert.alert(
+        'Success!',
+        'Bio updated',
+        [{ style: "default" }],
+        { cancelable: true },
+      )
+    }
+    catch {
+      Alert.alert(
+        'Update Failed',
+        'Bio not updated. Please try again or contact Support',
+        [{ style: "default" }],
+        { cancelable: true },
+      )
+    }
+  }
   // ---------------------------------------------------------------------------
   return (
     <Container>
@@ -121,7 +252,7 @@ export default function Dashboard({ navigation }) {
             <HeaderImage source={logo}/>
           </SpaceView>
           <SearchBarTextInput placeholder='Search'/>
-          <HeaderTouchable>
+          <HeaderTouchable onPress={handleRefresh}>
             <AddIcon name='refresh-cw' size={20}/>
           </HeaderTouchable>
           <HeaderTouchable onPress={handleSettings}>
@@ -130,7 +261,6 @@ export default function Dashboard({ navigation }) {
         </Header>
 
         <HeaderTabView>
-          <UserNameText>{user_name}</UserNameText>
           <DateText>{formattedDate(new Date())}</DateText>
         </HeaderTabView>
 
@@ -152,23 +282,49 @@ export default function Dashboard({ navigation }) {
                   <UserImage
                     source={
                       user_photo
-                        ? { uri: user_photo }
+                        ? { uri: user_photo.url }
                         : insert
                     }
                   />
                 </UserImageBackgroundView>
               )
             }
-            <FollowersView onPress={handleFollow}>
-              <LabelBold>{countFollowers}</LabelBold>
-              <LabelNormal>Followers</LabelNormal>
-            </FollowersView>
-            <FollowersView>
-              <LabelBold>{countFollowing}</LabelBold>
-              <LabelNormal>Following</LabelNormal>
-            </FollowersView>
+            <UserInfoView>
+              <UserNameText>{userUserName}</UserNameText>
+              <FirstNameWrapper>
+                <LabelBold2>{userFirstName}</LabelBold2>
+                <LabelBold2>{userLastName}</LabelBold2>
+              </FirstNameWrapper>
+              <FollowersWrapper>
+                <FollowersView onPress={handleFollow}>
+                  <LabelBold>{countFollowers}</LabelBold>
+                  <LabelNormal>Followers</LabelNormal>
+                </FollowersView>
+                <FollowersView onPress={handleFollow}>
+                  <LabelBold>{countFollowers}</LabelBold>
+                  <LabelNormal>Followers</LabelNormal>
+                </FollowersView>
+              </FollowersWrapper>
+            </UserInfoView>
           </UserProfileView>
         </UserView>
+
+        <ContentView>
+          <SocialMediaWrapper>
+            <SocialMediaView>
+              <SocialMediaButton onPress={handleToggleInstagram}>
+                <Iicon name='instagram' size={20}/>
+              </SocialMediaButton>
+              <BioText>{userInstagram}</BioText>
+            </SocialMediaView>
+            <SocialMediaView>
+              <SocialMediaButton onPress={handleToggleLinkedIn}>
+                <Iicon name='linkedin' size={20}/>
+              </SocialMediaButton>
+              <BioText>{userLinkedIn}</BioText>
+            </SocialMediaView>
+          </SocialMediaWrapper>
+        </ContentView>
 
         <ContentView>
           <StatusView>
@@ -260,11 +416,11 @@ export default function Dashboard({ navigation }) {
                 <LabelSmallBoss>tomorrow</LabelSmallBoss>
                 <LabelSmallBoss>this week</LabelSmallBoss>
                 <LabelSmallBoss2>Total</LabelSmallBoss2>
-
               </BlockSegment>
             </BlockLargeBoss>
           </StatusView>
         </ContentView>
+
         <ContentView>
           <StatusView>
             <Label>Jobs Status:</Label>
@@ -359,6 +515,9 @@ export default function Dashboard({ navigation }) {
             </BlockLargeWorker>
           </StatusView>
         </ContentView>
+
+        <HrLine/>
+
         <ContentView>
           <StatusView>
             <Label>Bio:</Label>
@@ -366,22 +525,20 @@ export default function Dashboard({ navigation }) {
 
           <StatusView>
             <BlockLarge>
-              <BioText>
-              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-              </BioText>
+            {/* <SocialMediaButton onPress={handleToggleBio}> */}
+              <BioText>{userBio}</BioText>
+              {/* </SocialMediaButton> */}
+
             </BlockLarge>
+
+          </StatusView>
+          <StatusView>
+            <ButtonView onPress={handleToggleBio}>
+              <ButtonText>Edit Bio</ButtonText>
+            </ButtonView>
           </StatusView>
         </ContentView>
-        <ContentView>
-          <SocialMediaView>
-            <Iicon name='instagram' size={21}/>
-            <BioText>@mais.dennis</BioText>
-          </SocialMediaView>
-          <SocialMediaView>
-            <Iicon name='linkedin' size={21}/>
-            <BioText>linkedin.com/in/dennisdjlee/</BioText>
-          </SocialMediaView>
-        </ContentView>
+
         <ContentView>
 
         </ContentView>
@@ -391,6 +548,86 @@ export default function Dashboard({ navigation }) {
         <ContentView>
 
         </ContentView>
+
+        <Modal isVisible={toggleInstagram}>
+          <ModalView>
+            <CheckBoxWrapper>
+              <Label>Edit Instagram user name:</Label>
+              <Input
+                enablesReturnKeyAutomatically
+                multiline
+                value={userInstagram}
+                onChangeText={setUserInstagram}
+                placeholder="@username"
+              />
+              <HrLine/>
+              <ButtonView onPress={handleToggleInstagram}>
+                <ButtonText>Cancel</ButtonText>
+              </ButtonView>
+              <ButtonView onPress={handleInstagramSubmit}>
+                  <ButtonText>OK</ButtonText>
+              </ButtonView>
+            </CheckBoxWrapper>
+          </ModalView>
+        </Modal>
+
+        <Modal isVisible={toggleLinkedIn}>
+          <ModalView>
+            <CheckBoxWrapper>
+              <Label>Edit LinkedIn username:</Label>
+              <Input
+                enablesReturnKeyAutomatically
+                multiline
+                value={userLinkedIn}
+                onChangeText={setUserLinkedIn}
+                placeholder="username"
+              />
+              <LinkedInWrapper>
+                <LabelNormalSocialMedia>
+                  Just write the username.
+                </LabelNormalSocialMedia>
+              </LinkedInWrapper>
+              <LinkedInWrapper>
+                <LabelNormalSocialMedia>Ex: https://www.linkedin.com/in/</LabelNormalSocialMedia>
+                <LabelBoldSocialMedia>username</LabelBoldSocialMedia>
+                <LabelNormalSocialMedia>/</LabelNormalSocialMedia>
+              </LinkedInWrapper>
+              <HrLine/>
+              <ButtonView onPress={handleToggleLinkedIn}>
+                <ButtonText>Cancel</ButtonText>
+              </ButtonView>
+              <ButtonView onPress={handleLinkedInSubmit}>
+                <ButtonText>OK</ButtonText>
+              </ButtonView>
+
+            </CheckBoxWrapper>
+          </ModalView>
+        </Modal>
+
+        <Modal isVisible={toggleBio}>
+          <ModalView>
+            <CheckBoxWrapper>
+              <Label>Edit Bio:</Label>
+              <Input
+                enablesReturnKeyAutomatically
+                multiline
+                numberOfLines={4}
+                value={userBio}
+                onChangeText={setUserBio}
+                placeholder="Biography"
+              />
+              <HrLine/>
+              <ButtonView onPress={handleToggleBio}>
+                  <ButtonText>Cancel</ButtonText>
+              </ButtonView>
+              <ButtonView onPress={handleBioSubmit}>
+                  <ButtonText>OK</ButtonText>
+              </ButtonView>
+
+            </CheckBoxWrapper>
+          </ModalView>
+        </Modal>
+
       </FormScrollView>
     </Container>
   )

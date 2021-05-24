@@ -248,9 +248,9 @@ export default function Task({ data, navigation, taskConditionIndex }) {
         type: "image/jpg",
         name: `signature_${task_id}.jpg`,
       });
-
+      setSendingIndicator(!sendingIndicator)
       try {
-        setSendingIndicator(!sendingIndicator)
+
         const response = await api.post('signatures', formData);
 
         const { signature_id } = response.data;
@@ -258,7 +258,7 @@ export default function Task({ data, navigation, taskConditionIndex }) {
         await api.put(`tasks/confirm/${task_id}`, {
           signature_id,
         });
-        setSendingIndicator(!sendingIndicator)
+        setSendingIndicator(false)
         Alert.alert(
           'Success!',
           'Photo sent!',
@@ -272,6 +272,7 @@ export default function Task({ data, navigation, taskConditionIndex }) {
         )
       }
       catch {
+        setSendingIndicator(false)
         Alert.alert(
           'Error: Not able to send photo',
           'Please try again',

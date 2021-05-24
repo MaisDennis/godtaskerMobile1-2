@@ -1,7 +1,6 @@
 import { Platform, ScrollView, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 import { TextInputMask as InputMask } from 'react-native-masked-text'
-import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/Feather';
 // -----------------------------------------------------------------------------
 import Input from '~/components/Input';
@@ -81,15 +80,6 @@ export const LabelText = styled.Text`
   margin: 4px;
 `;
 
-export const Options = styled(Picker)`
-  height: 48px;
-  width: 80%;
-  padding-left: 16px;
-  margin: 8px 0;
-  border-radius: 4px;
-  color: #222;
-  background-color: #ddd;
-`;
 export const PhoneMask = styled(InputMask)`
   height: 48px;
   width: 80%;

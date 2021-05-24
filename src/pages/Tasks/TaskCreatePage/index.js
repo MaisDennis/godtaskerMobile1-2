@@ -279,7 +279,7 @@ export default function TaskCreatePage({ navigation }) {
         'Task Registered',
         [{ style: "default" }],
         { cancelable: true },
-        )
+      )
     } catch(error) {
       setSubmitError(true)
       Alert.alert(
@@ -634,13 +634,15 @@ export default function TaskCreatePage({ navigation }) {
             <LabelText>Start Date:</LabelText>
             <DateOptionsView>
               <DateOptions
+                mode={'datetime'}
                 date={startDate}
                 onDateChange={setStartDate}
-                locale='pt'
-                is24hourSource='locale'
+                locale='en'
+                // is24hourSource='locale'
                 androidVariant="nativeAndroid"
-                textColor="#666"
+                textColor="#000"
                 textSize="24"
+                minimumDate={new Date()}
               />
             </DateOptionsView>
             <LabelText>Due Date:</LabelText>
@@ -648,13 +650,20 @@ export default function TaskCreatePage({ navigation }) {
               <DateOptions
                 date={dueDate}
                 onDateChange={setDueDate}
-                locale='pt'
-                is24hourSource='locale'
+                locale='en'
+                // is24hourSource='locale'
                 androidVariant="nativeAndroid"
-                textColor="#666"
-                textSize="30"
+                textColor="#000"
+                textSize="24"
+                minimumDate={new Date()}
               />
             </DateOptionsView>
+
+            <HrLine/>
+
+            <ButtonView onPress={handleToggleDates}>
+                <ButtonText>OK</ButtonText>
+            </ButtonView>
               {/* <LabelText>Due Date:</LabelText>
               <DatesNumberWrapper>
                 <DatesNumberView>
@@ -748,11 +757,7 @@ export default function TaskCreatePage({ navigation }) {
                   <DatesButtonText>:45</DatesButtonText>
                 </DatesButton2>
               </DatesNumberWrapper> */}
-              <HrLine/>
 
-              <ButtonView onPress={handleToggleDates}>
-                  <ButtonText>OK</ButtonText>
-              </ButtonView>
             </CheckBoxWrapper>
           </ModalView>
         </Modal>

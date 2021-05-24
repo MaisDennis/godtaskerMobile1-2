@@ -90,8 +90,6 @@ export default function FollowPage({ navigation }) {
       }
     })
     setContacts(response.data)
-
-
   }
   // ---------------------------------------------------------------------------
   return (
