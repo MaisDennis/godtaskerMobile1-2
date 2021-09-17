@@ -21,6 +21,7 @@ export default function Contacts({ navigation, data }) {
       worker_name: data.worker_name,
       department: data.department,
       // phonenumber: data.phonenumber,
+      bio: data.bio,
       avatar: data.avatar ? data.avatar.url : ''
     })
   }
@@ -28,7 +29,6 @@ export default function Contacts({ navigation, data }) {
   // ---------------------------------------------------------------------------
   return (
     <Container onPress={handleWorkerPage}>
-      {/* <TouchableOpacity onPress={handleToggleContact}> */}
       <Body>
         <UserInfoView>
           { data === undefined || data.avatar === null
@@ -51,7 +51,10 @@ export default function Contacts({ navigation, data }) {
             </TextNameView>
             <TextBio
               numberOfLines={1}
-            >Accountant, Tax Specialist, humanitarian movement coordinator</TextBio>
+            >
+              {data.bio}
+              {/* Accountant, Tax Specialist, humanitarian movement coordinator */}
+            </TextBio>
             <TextFollowedBy>Followed by nina_ + 5 more</TextFollowedBy>
           </TextView>
 

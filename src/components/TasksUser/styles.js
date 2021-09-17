@@ -21,8 +21,8 @@ export const AlignDetailsView = styled.View`
 `;
 
 export const BackButton = styled(TouchableOpacity)`
-  height: 40px;
-  width: 120px;
+  height: 36px;
+  width: 100%;
   border-radius: 8px;
   margin: 8px auto;
   padding: 0 16px;
@@ -163,6 +163,7 @@ export const DescriptionSpan = styled.Text`
   font-size: 14px;
   text-align: justify;
   line-height: 20px;
+  max-width: 85%;
   margin: 4px;
   color: #222;
 `;
@@ -184,6 +185,17 @@ export const DueTimeView = styled.View`
 export const DueTime = styled.Text`
   font-weight: normal;
   font-size: ${Platform.OS === 'ios' ? '15px' : '14px'};
+`;
+
+export const FormScrollView = styled.ScrollView.attrs({
+  contentContainerStyle: {
+    alignItems: 'center',
+  },
+})`
+  width: 100%;
+  border-radius: 8px;
+  background-color: #fff;
+  /* background-color: #f5f; */
 `;
 
 export const IconsView = styled.View`
@@ -244,14 +256,14 @@ export const LeftView = styled.View`
 `;
 
 export const ModalView = styled.View`
-  display: flex;
-  flex-direction:column;
+  /* display: flex;
+  flex-direction:column; */
   align-items: center;
   width: 100%;
   height: auto;
   border-radius: 8px;
   padding: 12px 0;
-  background-color: #fff;
+  /* background-color: #f5f; */
 `;
 
 export const NameText = styled.Text`

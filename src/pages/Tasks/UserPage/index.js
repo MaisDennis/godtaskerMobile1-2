@@ -104,7 +104,7 @@ export default function UserPage({ navigation }) {
       </HeaderTabView>
       { tasks == ''
         ? (
-          <Title>Sem tarefas nessa condição.</Title>
+          <Title>No tasks with this status</Title>
         )
         : (
           <List

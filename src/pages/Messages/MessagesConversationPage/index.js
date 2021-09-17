@@ -32,11 +32,14 @@ import { updateMessagesRequest, updateForwardMessage } from '~/store/modules/mes
 // import messaging from '@react-native-firebase/messaging';
 
 export default function MessagesConversationPage({ navigation, route }) {
+  // console.log(route.params)
   const userId = useSelector(state => state.user.profile.id);
   const messageWorkerId = route.params.worker_id;
   const messageWorkerData = route.params.workerData;
   const messageUserId = route.params.user_id;
   const messageUserData = route.params.userData;
+  const workerName=route.params.worker_name;
+  const userName=route.params.user_name;
   const chat_id = route.params.chat_id;
   const inverted = route.params.inverted;
 
@@ -135,6 +138,7 @@ export default function MessagesConversationPage({ navigation, route }) {
             user_id: messageUserId,
             worker_id: messageWorkerId,
             chat_id: chat_id,
+            messaged_at: JSON.stringify(new Date()),
           });
           dispatch(updateMessagesRequest(new Date()))
           setFirstMessage(false);
@@ -281,7 +285,6 @@ export default function MessagesConversationPage({ navigation, route }) {
                     : (
                       <MessageView
                         sender={item.sender}
-                        // colors={['#FBFF2E', '#4BFF2E']}
                         colors={['#fff', '#4BFF2E']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 0, y: 1 }}
@@ -332,7 +335,6 @@ export default function MessagesConversationPage({ navigation, route }) {
                     ? (
                       <MessageViewUser
                         sender={item.sender}
-                        // colors={['#2EFFFF', '#FC56FF']}
                         colors={['#fff', '#FC56FF']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 0, y: 1 }}
@@ -378,7 +380,6 @@ export default function MessagesConversationPage({ navigation, route }) {
                     : (
                       <MessageView
                         sender={item.sender}
-                        // colors={['#FBFF2E', '#4BFF2E']}
                         colors={['#fff', '#4BFF2E']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 0, y: 1 }}
@@ -501,8 +502,8 @@ export default function MessagesConversationPage({ navigation, route }) {
                 <SenderView>
                   <SenderText numberOfLines={1}>
                     { inverted
-                      ? messageWorkerData.worker_name
-                      : messageUserData.user_name
+                      ? (messageWorkerData.worker_name || workerName)
+                      : (messageUserData.user_name || UserName)
                     }
                   </SenderText>
                   <SenderAboutText numberOfLines={1}>
@@ -532,7 +533,7 @@ export default function MessagesConversationPage({ navigation, route }) {
                 }
                 <SenderView>
                   <SenderText numberOfLines={1}>
-                    {messageWorkerData.worker_name}
+                    {messageWorkerData.worker_name || workerName}
                   </SenderText>
                   <SenderAboutText numberOfLines={1}>
                     { route.params.bio

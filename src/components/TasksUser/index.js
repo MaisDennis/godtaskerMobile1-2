@@ -16,6 +16,7 @@ import {
   CenterView, CheckBoxView, Container,
   DescriptionView, DescriptionBorderView, DescriptionSpan,
   DatesAndButtonView, DueTimeView, DueTime, DetailsView,
+  FormScrollView,
   IconsView,
   Image, ImageView, ImageWrapper, InnerStatusView,
   Label, LabelInitiated, LabelEnded, LeftView,
@@ -44,10 +45,17 @@ const formattedDateTime = fdate =>
     ? '-'
     : format(parseISO(fdate), "dd'-'MMM'-'yyyy HH:mm", { locale: pt });
 
-  export default function TaskUser({ data, navigation, taskConditionIndex }) {
+export default function TaskUser({ data, navigation, taskConditionIndex }) {
+  // console.log(data)
+
   const dispatch = useDispatch();
   const updated_tasks = useSelector( state => state.task.tasks)
+
+  const user_id = data.user.id;
+  const worker_id = data.worker.id;
+
   const workerData = data.worker
+  const userData = data.user
   const dueDate = parseISO(data.due_date);
   const endDate = parseISO(data.end_date);
   const subTasks = data.sub_task_list
@@ -62,6 +70,15 @@ const formattedDateTime = fdate =>
     handleMessageBell()
     setStatusResult(handleStatus())
     // console.log(data)
+
+  //   fetch('https://extreme-ip-lookup.com/json/')
+  //   .then( res => res.json())
+  //   .then(response => {
+  //    console.log("Country is : ", response);
+  //  })
+  //  .catch((data, status) => {
+  //    console.log('Request failed:', data);
+  //  });
   }, [ updated_tasks ])
 
   async function handleMessageBell() {
@@ -134,28 +151,45 @@ const formattedDateTime = fdate =>
     return
   }
 
-  async function handletoggleCheckBox(value, position) {
-    setToggleCheckBox(!toggleCheckBox) // this distoggles the checkbox
-    const editedSubTaskList = data.sub_task_list
-    editedSubTaskList[position].complete = value
-    // await api.put(`tasks/${data.id}`, {
-    //   sub_task_list: editedSubTaskList
-    // })
-    return
-  }
-
-  function handleMessage() {
+  async function handleMessageConversation() {
     setToggleTask(!toggleTask)
+    const response = await api.get('/messages', {
+      params: {
+        user_id: user_id,
+        worker_id: worker_id,
+      },
+    })
+    const messageData = response.data
+    // console.log(response.data)
+    if(response.data.message === null) {
+      const chat_id = Math.floor(Math.random() * 1000000)
+
+      navigation.navigate('MessagesConversationPage', {
+        // id: data.id,
+        user_id: user_id,
+        user_name: userData.user_name,
+        userData: userData,
+        worker_id: worker_id,
+        worker_name: workerData.worker_name,
+        workerData: workerData,
+        chat_id: chat_id,
+        avatar: workerData.avatar,
+        first_message: true,
+      });
+      return
+    }
+
     navigation.navigate('MessagesConversationPage', {
-      id: data.id,
-      user_id: data.user.id,
-      user_name: data.user.user_name,
-      worker_id: data.worker.id,
-      worker_name: data.worker.worker_name,
-      worker_phonenumber: data.workerphonenumber,
-      message_id: data.message_id,
-      messages: data.messageBell,
-      avatar: data.worker.avatar,
+      // id: data.id,
+      user_id: userData.id,
+      user_name: userData.user_name,
+      userData: userData,
+      worker_id: workerData.id,
+      worker_name: workerData.worker_name,
+      workerData: workerData,
+      avatar: workerData.avatar,
+      chat_id: response.data.message.chat_id,
+      inverted: response.data.inverted,
     });
   }
 
@@ -304,8 +338,8 @@ const formattedDateTime = fdate =>
 {/* ------------------------------------------------------------------------ */}
       <Modal isVisible={toggleTask}>
       <ModalView>
+      <FormScrollView>
         <CenterView>
-
           <TitleBorderView>
             <TitleIcon name="clipboard"/>
             <TitleTextModal>{data.name}</TitleTextModal>
@@ -320,12 +354,8 @@ const formattedDateTime = fdate =>
               <AlignCheckBoxView key={index}>
                 <CheckBoxView>
                     <CheckBox
-                      disabled={false}
-                      value={s.complete}
-                      onValueChange={
-                        (newValue) => handletoggleCheckBox(newValue, index)
-                      }
                       disabled={true}
+                      value={s.complete}
                     />
                     <DescriptionSpan>{s.weige_percentage}%</DescriptionSpan>
                     <DescriptionSpan type="check-box">{s.description}</DescriptionSpan>
@@ -396,22 +426,6 @@ const formattedDateTime = fdate =>
                 </TaskAttributesView>
               </TagView>
             </DetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Urgency:</Label>
-                <TaskAttributesView taskAttributes={data.task_attributes[1]-1}>
-                  <DueTime>{taskAttributesArray[data.task_attributes[1]-1]}</DueTime>
-                </TaskAttributesView>
-              </TagView>
-            </DetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Complexity:</Label>
-                <TaskAttributesView taskAttributes={data.task_attributes[1]-1}>
-                  <DueTime>{taskAttributesArray[data.task_attributes[1]-1]}</DueTime>
-                </TaskAttributesView>
-              </TagView>
-            </DetailsView>
 
             <DetailsView>
               <TagView>
@@ -424,15 +438,15 @@ const formattedDateTime = fdate =>
 
           <DescriptionView>
             {/* <HrLine/> */}
-            <Label>Obs.</Label>
+            <Label>Comments</Label>
             <DescriptionBorderView pastDueDate={pastDueDate()}>
               <DescriptionSpan>{data.description}</DescriptionSpan>
             </DescriptionBorderView>
           </DescriptionView>
 
           <IconsView>
-            <ButtonView onPress={handleMessage}>
-              <TaskIcon name="message-circle"/>
+            <ButtonView onPress={handleMessageConversation}>
+              <TaskIcon name="message-square"/>
             </ButtonView>
             { taskConditionIndex === 1
               ? (
@@ -501,6 +515,7 @@ const formattedDateTime = fdate =>
               </ImageView>
             </ImageWrapper>
           }
+        </FormScrollView>
         </ModalView>
       </Modal>
     </Container>

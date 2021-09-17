@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { DatePickerModal } from 'react-native-paper-dates';
+// import { DatePickerModal } from 'react-native-paper-dates';
 import { useSelector, useDispatch } from 'react-redux';
 import { Alert, TouchableOpacity } from 'react-native'
 import CheckBox from '@react-native-community/checkbox';
@@ -7,7 +7,7 @@ import Modal from 'react-native-modal';
 import { parseISO, isBefore , isSameHour, subHours, addMinutes, format } from 'date-fns';
 // -----------------------------------------------------------------------------
 import {
-  AlignView, AlignCheckBoxView,
+  AlignCheckBoxView,
   ButtonView, ButtonView2, ButtonText,
   CheckBoxWrapper, CheckBoxView, Container,
   DateOptionsView, DateOptions, DescriptionSpan,
@@ -15,7 +15,7 @@ import {
   HrLine,
   ItemWrapperView, Input,
   LabelText,
-  ModalButtonWrapper, ModalView,
+  ModalView,
   RadioButtonView, RadioButtonTag, RadioButtonTagConfirmPhoto,
   RadioButtonLabel, RadioButtonOuter, RadioButtonInner0,
   RadioButtonInner1, RadioButtonInner2, RadioButtonInner3,
@@ -25,13 +25,11 @@ import {
   SubTaskLeftView, SubTaskRightView,
   SubTaskTag, SubTaskText,
   SubTaskWeigeText, SubTaskWrapper, SubTaskView,
-  SubmitButton, SubmitButtonText, SubmitIcon,
-  SubmitView,
+  SubmitButton, SubmitButtonText,
   WeigeView, WeigeTagView, WeigeText,
 } from './styles'
 import NumberInput from '~/components/NumberInput'
 import { updateTasks } from '~/store/modules/task/actions';
-import { updateMessagesRequest } from '~/store/modules/message/actions';
 import api from '~/services/api';
 
 export default function TaskCreatePage({ navigation }) {
@@ -75,25 +73,11 @@ export default function TaskCreatePage({ navigation }) {
     [setOpen, setDate]
   );
 
-  const taskAttributesArray = [
-    { id: 1, tag: 'baixa'},
-    { id: 2, tag: 'média'},
-    { id: 3, tag: 'alta'},
-    { id: 4, tag: ''},
-  ]
-
-  const confirmPhotoArray = [
-    { id: true, tag: 'Sim'},
-    { id: false, tag: 'Não'}
-  ]
-
   useEffect(() => {
     loadContacts(userId);
   }, [ userId ])
 
   async function loadContacts(userID) {
-    // const response = await api.get(`users/${userID}/contact-list`, {
-    // })
     const response = await api.get(`/users/${userID}/following`)
 
     const checkedList = response.data
@@ -107,10 +91,12 @@ export default function TaskCreatePage({ navigation }) {
   async function handletoggleCheckBox(value, position) {
     setToggleCheckBox(!toggleCheckBox) // this distoggles the checkbox
     editedWorkers = contacts;
-    const editedWorker = editedWorkers.find((e, index) => index === position)
-    editedWorker.checked = value
-    editedWorkers[position] = editedWorker
-    setContacts(editedWorkers)
+    const editedWorker = editedWorkers.find(
+      (e, index) => index === position
+    );
+    editedWorker.checked = value;
+    editedWorkers[position] = editedWorker;
+    setContacts(editedWorkers);
     return
   }
 
@@ -121,8 +107,6 @@ export default function TaskCreatePage({ navigation }) {
   function handleToggleDates() {
     setToggleDates(!toggleDates)
   }
-
-
 
   function handleAddSubTask() {
     if (addSubTaskInputValue === undefined) return;
@@ -139,7 +123,6 @@ export default function TaskCreatePage({ navigation }) {
     })
     setSubTaskList(editedSubTaskList)
     setAddSubTaskInputValue();
-    // console.log(subTaskList)
     navigation.navigate('TaskCreate');
     // dispatch(updateTasks(new Date()))
   }
@@ -162,9 +145,6 @@ export default function TaskCreatePage({ navigation }) {
     setSubTaskList(editedSubTaskList)
     setEditSubTaskIndex(null);
     setSubTaskToggleEdit(false);
-    // navigation.navigate('TaskEdit',{
-    //   sub_task_list: subTaskList,
-    // });
   }
 
   function handleDeleteSubTask(position) {
@@ -183,7 +163,9 @@ export default function TaskCreatePage({ navigation }) {
     }
 
     for(let i = 0; i < subTasks.length; i++) {
-      subTasks[i].weige_percentage = (Math.round((parseFloat(subTasks[i].weige) / weigeSum)*1000) /10)
+      subTasks[i].weige_percentage = (
+        Math.round((parseFloat(subTasks[i].weige) / weigeSum)*1000)/10
+      )
     }
     return weigeSum;
   }
@@ -209,8 +191,8 @@ export default function TaskCreatePage({ navigation }) {
       }, userId
     ]);
     dispatch(updateTasks(new Date()))
-    dispatch(updateMessagesRequest(new Date()))
-    setToggleModal(!toggleModal)
+    // dispatch(updateMessagesRequest(new Date()))
+    // setToggleModal(!toggleModal)
   }
 
   function handleSubmit() {
@@ -289,7 +271,6 @@ export default function TaskCreatePage({ navigation }) {
         { cancelable: true },
       )
     }
-    // dispatch(updateTasks(new Date()))
     navigation.goBack()
   }
   // ---------------------------------------------------------------------------
@@ -610,22 +591,7 @@ export default function TaskCreatePage({ navigation }) {
 
         <>
 
-      <DatePickerModal
-        // locale={'en'} optional, default: automatic
-        mode="single"
-        visible={open}
-        onDismiss={onDismissSingle}
-        date={date}
-        onConfirm={onConfirmSingle}
-        // validRange={{
-        //   startDate: new Date(2021, 1, 2),  // optional
-        //   endDate: new Date(), // optional
-        // }}
-        // onChange={} // same props as onConfirm but triggered without confirmed by user
-        // saveLabel="Save" // optional
-        // label="Select date" // optional
-        // animationType="slide" // optional, default is 'slide' on ios/android and 'none' on web
-      />
+
     </>
 
         <Modal isVisible={toggleDates}>

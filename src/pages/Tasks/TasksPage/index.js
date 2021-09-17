@@ -77,18 +77,18 @@ export default function Dashboard({ navigation }) {
 
       <HeaderTabView>
         <UpperTabView onPress={() => loadTasks()}>
-          <UpperTabText>em aberto</UpperTabText>
+          <UpperTabText>Open</UpperTabText>
         </UpperTabView>
         <UpperTabView onPress={() => loadFinished()}>
-          <UpperTabText>finalizadas</UpperTabText>
+          <UpperTabText>Finished</UpperTabText>
         </UpperTabView>
         <UpperTabView onPress={() => loadCanceled()}>
-          <UpperTabText>canceladas</UpperTabText>
+          <UpperTabText>Canceled</UpperTabText>
         </UpperTabView>
       </HeaderTabView>
       { tasks == ''
         ? (
-          <Title>Sem tarefas nessa condição.</Title>
+          <Title>No tasks with this status</Title>
         )
         : (
           <List

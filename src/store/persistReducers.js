@@ -6,7 +6,7 @@ export default reducers => {
     {
       key: 'gerenteDash',
       storage: AsyncStorage,
-      whitelist: ['worker', 'user', 'auth'],
+      whitelist: ['auth', 'user', 'worker'],
     },
     reducers
   );

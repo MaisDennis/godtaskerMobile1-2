@@ -292,21 +292,21 @@ export const LabelBoldBoss = styled.Text`
 `;
 
 export const LabelBoldBoss2 = styled.Text`
-  width: auto;
+  width: 24px;
   font-weight: bold;
   font-size: 14px;
   text-align: center;
-  margin: 0 30px;
+  margin: 0 22px;
   color: #009966;
   /* background-color: #999; */
 `;
 
 export const LabelBoldRed = styled.Text`
-  width: auto;
+  width: 24px;
   font-weight: bold;
   font-size: 14px;
   text-align: center;
-  margin: 0 30px;
+  margin: 0 22px;
   color: #F64C75;
   /* background-color: #999; */
 `;
@@ -331,11 +331,11 @@ export const LabelBoldWorker = styled.Text`
 `;
 
 export const LabelBoldWorker2 = styled.Text`
-  width: auto;
+  width: 24px;
   font-weight: bold;
   font-size: 14px;
   text-align: center;
-  margin: 0 30px;
+  margin: 0 22px;
   color: #334466;
   /* background-color: #999; */
 `;

@@ -12,11 +12,6 @@ export const Container = styled.SafeAreaView`
   height: 100%;
 `;
 
-export const DateText = styled.Text`
-  color: #000;
-  margin: 0 12px;
-`;
-
 export const Header = styled.View`
 display: flex;
 flex-direction: row;
@@ -26,13 +21,6 @@ height: 42px; /* maintain in px. */
 width: 100%;
 background-color: #fff;
 /* background-color: #f5f; */
-`;
-
-export const HeaderImage = styled.Image`
-height: 30px;
-width: 32px;
-margin: 0 16px;
-/* background: #f00; */
 `;
 
 export const HeaderTabView = styled.View`
@@ -72,16 +60,6 @@ export const SearchBarTextInput = styled.TextInput`
   background-color: #ddd;
 `;
 
-export const SpaceView = styled.View`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  height: 100%;
-  width: 24%;
-  background-color: #fff;
-  /* background-color: #f5f; */
-`;
-
 export const Title = styled.Text`
   font-weight: bold;
   font-size: 12px;
@@ -104,12 +82,4 @@ export const UpperTabText = styled.Text`
   font-size: 12px;
   font-weight: 700;
   color: #fff;
-`;
-
-export const UserNameText = styled.Text`
-  height: 24px;
-  font-size: 16px;
-  font-weight: bold;
-  margin: 0 20px;
-  color: #000;
 `;

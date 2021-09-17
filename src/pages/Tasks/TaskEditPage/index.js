@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Alert } from 'react-native';
-// import { useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Modal from 'react-native-modal';
 import { parseISO, isBefore , isSameHour, subHours, addMinutes, format } from 'date-fns';
 // -----------------------------------------------------------------------------
@@ -28,18 +28,18 @@ import {
   WeigeView, WeigeTagView, WeigeText,
 } from './styles'
 import NumberInput from '~/components/NumberInput'
-// import { updateTasks } from '~/store/modules/task/actions';
+import { updateTasks } from '~/store/modules/task/actions';
 import api from '~/services/api';
 
 export default function TaskEditPage({ navigation, route }) {
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const data = route.params;
 
   const [name, setName] = useState(data.name);
   const [description, setDescription] = useState(data.description);
   const [prior, setPrior] = useState(data.task_attributes[0]);
-  // const [urgent, setUrgent] = useState(data.task_attributes[1]);
-  // const [complex, setComplex] = useState(data.task_attributes[2]);
+  const [urgent, setUrgent] = useState(data.task_attributes[1]);
+  const [complex, setComplex] = useState(data.task_attributes[2]);
   const [startDate, setStartDate] = useState(parseISO(data.start_date));
   const [dueDate, setDueDate] = useState(parseISO(data.due_date));
 
@@ -118,6 +118,21 @@ export default function TaskEditPage({ navigation, route }) {
     return weigeSum;
   }
 
+  async function editTasks() {
+    weigeToPercentage(subTaskList)
+
+    await api.put(`tasks/${data.id}/notification/user`, {
+      name: name,
+      description: description,
+      sub_task_list: subTaskList,
+      task_attributes: [prior, urgent, complex],
+      start_date: startDate,
+      due_date: dueDate,
+    });
+
+    dispatch(updateTasks(new Date()))
+  }
+
   async function handleSubmit() {
     if (name === '') {
       Alert.alert(
@@ -158,33 +173,25 @@ export default function TaskEditPage({ navigation, route }) {
     }
 
     try {
-      weigeToPercentage(subTaskList)
+      editTasks()
 
-      await api.put(`tasks/${data.id}/notification/user`, {
-        name: name,
-        description: description,
-        sub_task_list: subTaskList,
-        task_attributes: [prior, urgent, complex],
-        start_date: startDate,
-        due_date: dueDate,
-      });
       Alert.alert(
         'Success!',
-        'Task Registered',
+        'Task Edited',
         [{ style: "default" }],
         { cancelable: true },
       )
-      // navigation.goBack();
     }
     catch(error) {
       console.log(error)
       Alert.alert(
-        'Error: Task not registered',
+        'Error: Task not edited',
         'Please try again',
         [{ style: "default" }],
         { cancelable: true },
       )
     }
+    navigation.goBack();
   }
   // ---------------------------------------------------------------------------
   return (
@@ -365,66 +372,6 @@ export default function TaskEditPage({ navigation, route }) {
             </RadioButtonTag>
           </RadioButtonView>
         </ItemWrapperView>
-
-        {/* <ItemWrapperView>
-          <LabelText>Urgência:</LabelText>
-          <RadioButtonView>
-            <RadioButtonTag onPress={() => setUrgent(1)}>
-              <RadioButtonLabel>baixa</RadioButtonLabel>
-              <RadioButtonOuter>
-                <RadioButtonInner1 switch={urgent}/>
-              </RadioButtonOuter>
-            </RadioButtonTag>
-            <RadioButtonTag onPress={() => setUrgent(2)}>
-              <RadioButtonLabel>média</RadioButtonLabel>
-              <RadioButtonOuter>
-                <RadioButtonInner2 switch={urgent}/>
-              </RadioButtonOuter>
-            </RadioButtonTag>
-            <RadioButtonTag onPress={() => setUrgent(3)}>
-              <RadioButtonLabel>alta</RadioButtonLabel>
-              <RadioButtonOuter>
-                <RadioButtonInner3 switch={urgent}/>
-              </RadioButtonOuter>
-            </RadioButtonTag>
-            <RadioButtonTag onPress={() => setUrgent(4)}>
-              <RadioButtonLabel>n/a</RadioButtonLabel>
-              <RadioButtonOuter>
-                <RadioButtonInner4 switch={urgent}/>
-              </RadioButtonOuter>
-            </RadioButtonTag>
-          </RadioButtonView>
-        </ItemWrapperView>
-
-        <ItemWrapperView>
-          <LabelText>Complexidade:</LabelText>
-          <RadioButtonView>
-            <RadioButtonTag onPress={() => setComplex(1)}>
-              <RadioButtonLabel>baixa</RadioButtonLabel>
-              <RadioButtonOuter>
-                <RadioButtonInner1 switch={complex}/>
-              </RadioButtonOuter>
-            </RadioButtonTag>
-            <RadioButtonTag onPress={() => setComplex(2)}>
-              <RadioButtonLabel>média</RadioButtonLabel>
-              <RadioButtonOuter>
-                <RadioButtonInner2 switch={complex}/>
-              </RadioButtonOuter>
-            </RadioButtonTag>
-            <RadioButtonTag onPress={() => setComplex(3)}>
-              <RadioButtonLabel>alta</RadioButtonLabel>
-              <RadioButtonOuter>
-                <RadioButtonInner3 switch={complex}/>
-              </RadioButtonOuter>
-            </RadioButtonTag>
-            <RadioButtonTag onPress={() => setComplex(4)}>
-              <RadioButtonLabel>n/a</RadioButtonLabel>
-              <RadioButtonOuter>
-                <RadioButtonInner4 switch={complex}/>
-              </RadioButtonOuter>
-            </RadioButtonTag>
-          </RadioButtonView>
-        </ItemWrapperView> */}
 
         <ItemWrapperView>
           <LabelText>Other Comments:</LabelText>

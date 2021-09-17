@@ -4,31 +4,35 @@ import Icon from 'react-native-vector-icons/Feather';
 import LinearGradient from 'react-native-linear-gradient';
 import Button from '~/components/Button';
 
-
-export const AlignBottomView = styled.View`
+export const AcceptButton = styled.View`
   display: flex;
-  flex-direction:column;
-  width: 100%;
-  /* background-color: #ee4; */
-`;
-export const AlignView = styled.View`
-  display: flex;
-  flex-direction:column;
+  flex-direction:row;
   align-items: center;
-  width: 100%;
-  /* background-color: #ee4; */
+  justify-content: center;
+  height: 36px;
+  width: 108px;
+  border-radius: 8px;
+  background-color: #18A0FB;
 `;
+
+export const AcceptButtonView = styled.View`
+  display: flex;
+  flex-direction:column;
+  align-items: flex-start;
+  height: auto;
+  width: 85%;
+  border-radius: 8px;
+  border-width: 1px;
+  border-color: #000;
+  padding: 0 0 16px;
+  /* background-color: #333e; */
+`;
+
 export const AlignCheckBoxView = styled.View`
   display: flex;
   flex-direction:column;
   align-items: flex-start;
   width: 100%;
-  /* background-color: #ee4; */
-`;
-export const AlignDatesView = styled.View`
-  display: flex;
-  flex-direction:column;
-  width: auto;
   /* background-color: #ee4; */
 `;
 
@@ -40,42 +44,12 @@ export const AlignDetailsView = styled.View`
   /* background-color: #666; */
 `;
 
-export const AsideView = styled.View`
-display: flex;
-flex-direction: column;
-align-items: flex-end;
-justify-content: center;
-width: 10%;
-  /* background-color: #336622; */
-`;
-export const AcceptButtonView = styled.View`
-  display: flex;
-  flex-direction:column;
-  align-items: flex-start;
-  height: auto;
-  width: 85%;
-  border-radius: 8px;
-  border-width: 1px;
-  border-color: #000;
-  /* background-color: #333e; */
-`;
-
-export const AcceptButton = styled.View`
-  display: flex;
-  flex-direction:row;
-  align-items: center;
-  justify-content: center;
-  height: 36px;
-  width: 108px;
-  border-radius: 4px;
-  background-color: #18A0FB;
-`;
-
 export const BackButton = styled(TouchableOpacity)`
-  height: 40px;
-  width: 120px;
+  height: 36px;
+  /* width: 120px; */
+  width: 100%;
   border-radius: 8px;
-  margin: 8px auto;
+  margin: 16px auto 8px;
   padding: 0 16px;
   background-color: #000;
 `;
@@ -116,10 +90,14 @@ export const BottomHeaderView = styled.View`
   /* background-color: #f44; */
 `;
 export const ButtonView = styled(TouchableOpacity)`
-  width: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 20%;
   text-align: center;
-  padding: 8px;
-  margin: 0 auto 16px;
+  margin: 0 auto;
   /* background: #f4f; */
 `;
 export const ButtonText = styled.Text`
@@ -136,6 +114,7 @@ export const ButtonWrapper = styled.View`
   align-items: flex-start;
   width: 100%;
   margin: 0;
+  /* padding: 4px 0 12px; */
   /* background-color: #fe2; */
 `;
 
@@ -157,7 +136,7 @@ export const CenterView = styled.View`
   justify-content: center;
   width: 80%;
   margin: 12px 0;
-  /* background-color: #e44; */
+  background-color: #e44;
 `;
 
 export const CheckBoxView = styled.View`
@@ -225,6 +204,7 @@ export const DescriptionSpan = styled.Text`
   font-size: 14px;
   text-align: justify;
   line-height: 20px;
+  max-width: 85%;
   margin: 4px;
   color: #222;
 `;
@@ -259,32 +239,22 @@ export const DueTime = styled.Text`
   font-size: ${Platform.OS === 'ios' ? '15px' : '14px'};
 `;
 
-export const FinishedButton = styled(Button)`
-background: #999;
+export const FormScrollView = styled.ScrollView.attrs({
+  contentContainerStyle: {
+    alignItems: 'center',
+  },
+})`
+  width: 100%;
+  border-radius: 8px;
+  background-color: #fff;
+  /* background-color: #f5f; */
 `;
 
-export const HeaderView = styled.View`
-  display: flex;
-  flex-direction:row;
-  align-items: center;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 8px;
-  border-radius: 24px;
-  /* background-color: #f00; */
-`;
 export const HrLine = styled.View`
   width: 100%;
   border-width: 0.5px;
   border-color: #ddd;
   margin: 4px auto;
-`;
-export const HrTitleLine = styled.View`
-  width: 100%;
-  border-width: 0.5px;
-  border-color: #ccc;
-  box-shadow: 2px 2px 2px #ccc;
-  margin: 0 auto;
 `;
 
 export const ImageWrapper = styled.View`
@@ -366,32 +336,6 @@ export const LeftView = styled.View`
   background-color: #D4D3FF;
 `;
 
-export const MainHeaderView = styled.View`
-  width: 90%;
-  /* background-color: #ee3; */
-`;
-export const MiddleHeaderView = styled.View`
-  display: flex;
-  flex-direction:column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  /* background-color: #f00; */
-`;
-
-export const FormScrollView = styled.ScrollView.attrs({
-  contentContainerStyle: {
-    alignItems: 'center',
-  },
-})`
-  /* align-items: center; */
-  width: 100%;
-  border-radius: 8px;
-
-  background-color: #fff;
-  /* background-color: #f5f; */
-`;
-
 export const ModalView = styled.View`
   align-items: center;
   width: 100%;
@@ -428,13 +372,13 @@ export const OuterStatusView = styled.View`
 export const RejectTaskInput = styled.TextInput`
   display: flex;
   height: auto;
-  width: 95%;
+  width: 85%;
   padding: 12px;
-  margin: 12px auto;
+  margin: 8px auto 16px;
   border-radius: 12px;
   border-width: 1px;
-  border-color: #ccc;
-  background-color: #fff;
+  border-color: #000;
+  background-color: #ddd;
 `;
 
 export const RejectButton = styled.View`
@@ -444,7 +388,7 @@ export const RejectButton = styled.View`
   justify-content: center;
   height: 36px;
   width: 108px;
-  border-radius: 4px;
+  border-radius: 8px;
   background-color: #999;
 `;
 
@@ -479,15 +423,7 @@ export const Time = styled.Text`
   font-size: 14px;
   color: ${props => props.pastDueDate === true ? '#f64C75' : '#19AE7C'};
 `;
-export const TopHeaderView = styled.View`
-  display: flex;
-  flex-direction:column;
-  width: 100%;
-  background-color: ${ props => props.toggleTask === true
-    ? '#334466'
-    : '#E7EEFF'
-  };
-`;
+
 export const TitleView = styled.View`
     display: flex;
   flex-direction: row;
@@ -572,7 +508,7 @@ export const ToWorkerView = styled.View`
 export const UserImage = styled.Image`
   height: 60px;
   width: 60px;
-  border-radius: 16px;
+  border-radius: 60px;
   border-width: 1px;
   border-color: #fff;
   background-color: #f5f5f5;
@@ -582,21 +518,15 @@ export const UserImageBackground = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 62px;
-  width: 62px;
-  border-radius: 16px;
+  height: 64px;
+  width: 64px;
+  border-radius: 64px;
   border-width: 1px;
   border-color: #334466;
   /* background-color: #fff; */
   /* background-color: #666; */
 `;
-export const UserView = styled.View`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 4px auto;
-  /* background-color: #f00; */
-`;
+
 export const UnreadMessageCountText = styled.Text`
   font-size: 12px;
   margin: auto;

@@ -1,64 +1,62 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState, useMemo } from 'react';
-import { ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { format, parseISO } from 'date-fns';
 import CheckBox from '@react-native-community/checkbox';
 import Modal from 'react-native-modal';
 import ImagePicker from 'react-native-image-crop-picker';
 import firestore from '@react-native-firebase/firestore';
-import pt from 'date-fns/locale/pt';
-import Icon from 'react-native-vector-icons/Feather';
+import { enUS, pt } from 'date-fns/locale/pt';
 // -----------------------------------------------------------------------------
-// import Button from '~/components/Button';
 import {
-  AsideView, AlignBottomView, AlignView,
-  AlignDatesView, AlignDetailsView, AlignCheckBoxView,
   AcceptButton, AcceptButtonView,
-  BackButton,
-  BodyView, BodyWrapper,
+  AlignCheckBoxView, AlignDetailsView,
+  BackButton, BodyView, BodyWrapper,
   ButtonView, ButtonText, BottomHeaderView,
   BellIcon, ButtonIcon, ButtonWrapper,
-  CenterView,
-  ConfirmButton, ConfirmIcon, CheckBoxView, Container,
-  CameraButton,
+  CenterView, ConfirmButton, ConfirmIcon,
+  CheckBoxView, Container, CameraButton,
   DescriptionView, DescriptionBorderView, DescriptionSpan,
   DatesAndButtonView, DueTimeView, DueTime, DetailsView,
   FormScrollView,
-  HeaderView, HrLine,
+  HrLine,
   IconsView,
   Image, ImageView, ImageWrapper, InnerStatusView,
   Label, LabelInitiated, LabelEnded, LeftView,
-  ModalView, ModalText, MessageButton, MiddleHeaderView, MainHeaderView,
+  ModalView, ModalText,
   NameText,
   OuterStatusView,
   RejectTaskInput, RejectButton, RightView,
   StartTimeView, StartTime,
-  TopHeaderView, TagView, TitleView, TaskIcon,
+  TagView, TitleView, TaskIcon,
   TitleText, TaskAttributesView, ToWorkerView, ToText, TitleIcon,
   TitleBorderView, TitleTextModal,
-  UnreadMessageCountText, UserView, UserImage, UserImageBackground,
+  UnreadMessageCountText, UserImage, UserImageBackground,
 } from './styles';
 import { updateTasks } from '~/store/modules/task/actions';
 import api from '~/services/api';
-// import message from '../../store/modules/message/reducer';
-// import firebase from '~/services/firebase'
 // -----------------------------------------------------------------------------
 const taskAttributesArray = [ 'baixa', 'média', 'alta', '-']
 const formattedDate = fdate =>
   fdate == null
     ? '-'
-    : format(parseISO(fdate), "dd'-'MMM'-'yyyy", { locale: pt });
+    : format(parseISO(fdate), "MMM'-'dd'-'yyyy", { locale: enUS });
 
 const formattedDateTime = fdate =>
   fdate == null
     ? '-'
-    : format(parseISO(fdate), "dd'-'MMM'-'yyyy HH:mm", { locale: pt });
+    : format(parseISO(fdate), "MMM'-'dd'-'yyyy HH:mm", { locale: enUS });
 
 export default function Task({ data, navigation, taskConditionIndex }) {
+  // console.log(data)
   const dispatch = useDispatch();
+
+  const user_id = data.user.id;
+  const worker_id = data.worker.id;
   const task_id = data.id;
   const userData = data.user
+  const workerData = data.worker
   const dueDate = parseISO(data.due_date);
   const endDate = parseISO(data.end_date);
   const subTasks = data.sub_task_list
@@ -149,7 +147,7 @@ export default function Task({ data, navigation, taskConditionIndex }) {
     }
   }
 
-  async function handletoggleCheckBox(value, position) {
+  async function handleToggleCheckBox(value, position) {
     const editedSubTaskList = data.sub_task_list
     editedSubTaskList[position].complete = value
     editedSubTaskList[position].user_read = false
@@ -161,17 +159,45 @@ export default function Task({ data, navigation, taskConditionIndex }) {
     setUpdateStatus(new Date())
   }
 
-  function handleMessage() {
+  async function handleMessageConversation() {
+    setToggleTask(!toggleTask)
+    const response = await api.get('/messages', {
+      params: {
+        user_id: worker_id,
+        worker_id: user_id,
+      },
+    })
+    const messageData = response.data
+    console.log(response.data)
+    if(response.data.message === null) {
+      const chat_id = Math.floor(Math.random() * 1000000)
+
+      navigation.navigate('MessagesConversationPage', {
+        // id: data.id,
+        user_id: worker_id,
+        user_name: workerData.worker_name,
+        userData: workerData,
+        worker_id: user_id,
+        worker_name: userData.user_name,
+        workerData: userData,
+        chat_id: chat_id,
+        avatar: userData.avatar,
+        first_message: true,
+      });
+      return
+    }
+
     navigation.navigate('MessagesConversationPage', {
-      id: data.id,
-      user_id: data.user.id,
-      user_name: data.user.user_name,
-      worker_id: data.worker.id,
-      worker_name: data.worker.worker_name,
-      worker_phonenumber: data.workerphonenumber,
-      message_id: data.message_id,
-      messages: data.messages,
-      avatar: data.user.avatar,
+      // id: data.id,
+      user_id: workerData.id,
+      user_name: workerData.worker_name,
+      userData: workerData,
+      worker_id: userData.id,
+      worker_name: userData.user_name,
+      workerData: userData,
+      avatar: userData.avatar,
+      chat_id: response.data.message.chat_id,
+      inverted: response.data.inverted,
     });
   }
 
@@ -450,273 +476,251 @@ export default function Task({ data, navigation, taskConditionIndex }) {
       </RightView>
 {/* ------------------------------------------------------------------------ */}
       <Modal isVisible={toggleTask}>
-
         <ModalView>
-        <FormScrollView
-          // contentContainerStyle={styles.alignItems}
-        >
-          <CenterView>
+          <FormScrollView>
+            <CenterView>
+              <TitleBorderView>
+                <TitleIcon name="clipboard"/>
+                <TitleTextModal>{data.name}</TitleTextModal>
+              </TitleBorderView>
+            </CenterView>
 
-            <TitleBorderView>
-              <TitleIcon name="clipboard"/>
-              <TitleTextModal>{data.name}</TitleTextModal>
-            </TitleBorderView>
-          </CenterView>
+            <DescriptionView>
+              <Label>Sub-items</Label>
+              <DescriptionBorderView pastDueDate={pastDueDate()}>
+                { data.sub_task_list.map((s, index) => (
+                  <AlignCheckBoxView key={index}>
+                    <CheckBoxView>
+                        <CheckBox
+                          disabled={data.status.status === 1 ? true : false}
+                          value={s.complete}
+                          onValueChange={
+                            (newValue) => handleToggleCheckBox(newValue, index)
+                          }
+                        />
+                        <DescriptionSpan>{s.weige_percentage}%</DescriptionSpan>
+                        <DescriptionSpan type="check-box">{s.description}</DescriptionSpan>
+                    </CheckBoxView>
+                  </AlignCheckBoxView>
+                ))}
+              </DescriptionBorderView>
+            </DescriptionView>
 
-          <DescriptionView>
-          <Label>Sub-items</Label>
-          <DescriptionBorderView pastDueDate={pastDueDate()}>
-            { data.sub_task_list.map((s, index) => (
-              <AlignCheckBoxView key={index}>
-                <CheckBoxView>
-                    <CheckBox
-                      disabled={false}
-                      value={s.complete}
-                      onValueChange={
-                        (newValue) => handletoggleCheckBox(newValue, index)
-                      }
-                      disabled={true}
-                    />
-                    <DescriptionSpan>{s.weige_percentage}%</DescriptionSpan>
-                    <DescriptionSpan type="check-box">{s.description}</DescriptionSpan>
-                </CheckBoxView>
-              </AlignCheckBoxView>
-            ))}
-          </DescriptionBorderView>
-        </DescriptionView>
-
-        <AlignDetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Start Date:</Label>
-                { data.initiated_at
-                  ? (
-                    <>
-
-                      <StartTimeView>
-                        <StartTime>{formattedDate(data.initiated_at)}</StartTime>
-                      </StartTimeView>
-                    </>
-                  )
-                  : (
-                    <>
-
-                      <StartTimeView initiated={data.initiated_at}>
-                        <StartTime>{formattedDate(data.start_date)}</StartTime>
-                      </StartTimeView>
-                    </>
-                  )
-                }
-              </TagView>
-            </DetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Due Date & Time:</Label>
-                { data.end_date !== null
-                  ? (
-                    <DueTimeView style={{backgroundColor:'#f5f5f5'}}>
-                      <DueTime>{formattedDateTime(data.due_date)}</DueTime>
-                    </DueTimeView>
-                  )
-                  : (
-                    <DueTimeView pastDueDate={pastDueDate()}>
-                      <DueTime>{formattedDateTime(data.due_date)}</DueTime>
-                    </DueTimeView>
-                  )
-                }
-              </TagView>
-            </DetailsView>
-            { data.end_date !== null &&
-              (
-                <DetailsView>
-                  <TagView>
-                    <Label>Ended:</Label>
-                    <DueTimeView pastDueDate={endPastDueDate()}>
-                      <DueTime>{formattedDateTime(data.end_date)}</DueTime>
-                    </DueTimeView>
-                  </TagView>
-                </DetailsView>
-              )
-            }
-            <DetailsView>
-              <TagView>
-                <Label>Priority:</Label>
-                <TaskAttributesView taskAttributes={data.task_attributes[0]-1}>
-                  <DueTime>{taskAttributesArray[JSON.stringify(data.task_attributes[0]-1)]}</DueTime>
-                </TaskAttributesView>
-              </TagView>
-            </DetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Urgency:</Label>
-                <TaskAttributesView taskAttributes={data.task_attributes[1]-1}>
-                  <DueTime>{taskAttributesArray[data.task_attributes[1]-1]}</DueTime>
-                </TaskAttributesView>
-              </TagView>
-            </DetailsView>
-            <DetailsView>
-              <TagView>
-                <Label>Complexity:</Label>
-                <TaskAttributesView taskAttributes={data.task_attributes[1]-1}>
-                  <DueTime>{taskAttributesArray[data.task_attributes[1]-1]}</DueTime>
-                </TaskAttributesView>
-              </TagView>
-            </DetailsView>
-
-            <DetailsView>
-              <TagView>
-                <Label>Confirmation with photograph?</Label>
-                <ToText>Sim</ToText>
-              </TagView>
-            </DetailsView>
-          </AlignDetailsView>
-
-          <DescriptionView>
-            {/* <HrLine/> */}
-            <Label>Obs.</Label>
-            <DescriptionBorderView pastDueDate={pastDueDate()}>
-              <DescriptionSpan>{data.description}</DescriptionSpan>
-            </DescriptionBorderView>
-          </DescriptionView>
-          { data.status && data.status.status !== 1
-            ? (
-              <IconsView>
-                <ButtonView onPress={handleMessage}>
-                  <ConfirmButton >
-                    <TaskIcon name="message-square"/>
-                  </ConfirmButton>
-                </ButtonView>
-                { taskConditionIndex === 1
-                  ? (
-                    <ButtonView onPress={handleConfirm}>
-                      <ConfirmButton>
-                        <ConfirmIcon name="check"/>
-                      </ConfirmButton>
-                    </ButtonView>
-                  )
-                  : (
-                    <ButtonView>
-                      <ConfirmButton>
-                        <ButtonIcon name="trash-2" style={{color: '#ccc'}}/>
-                      </ConfirmButton>
-                    </ButtonView>
-                  )
-                }
-              </IconsView>
-            )
-            : (
-              <AcceptButtonView>
-                <ModalText>Accept this task?</ModalText>
-                <ButtonWrapper>
-                  { taskConditionIndex === 1
+            <AlignDetailsView>
+              <DetailsView>
+                <TagView>
+                  <Label>Start Date:</Label>
+                  { data.initiated_at
                     ? (
                       <>
-                        <ButtonView onPress={handleToggleAccept}>
-                          <AcceptButton>
-                            <ButtonText>Accept</ButtonText>
-                          </AcceptButton>
-                        </ButtonView>
-                        <ButtonView onPress={() => setToggleModal(!toggleModal)}>
-                          <RejectButton>
-                          <ButtonText>Decline</ButtonText>
-                          </RejectButton>
-                        </ButtonView>
+
+                        <StartTimeView>
+                          <StartTime>{formattedDateTime(data.initiated_at)}</StartTime>
+                        </StartTimeView>
                       </>
                     )
                     : (
-                      null
+                      <>
+
+                        <StartTimeView initiated={data.initiated_at}>
+                          <StartTime>{formattedDateTime(data.start_date)}</StartTime>
+                        </StartTimeView>
+                      </>
                     )
                   }
+                </TagView>
+              </DetailsView>
+
+              <DetailsView>
+                <TagView>
+                  <Label>Due Date:</Label>
+                  { data.end_date !== null
+                    ? (
+                      <DueTimeView style={{backgroundColor:'#f5f5f5'}}>
+                        <DueTime>{formattedDateTime(data.due_date)}</DueTime>
+                      </DueTimeView>
+                    )
+                    : (
+                      <DueTimeView pastDueDate={pastDueDate()}>
+                        <DueTime>{formattedDateTime(data.due_date)}</DueTime>
+                      </DueTimeView>
+                    )
+                  }
+                </TagView>
+              </DetailsView>
+              { data.end_date !== null &&
+                (
+                  <DetailsView>
+                    <TagView>
+                      <Label>Ended:</Label>
+                      <DueTimeView pastDueDate={endPastDueDate()}>
+                        <DueTime>{formattedDateTime(data.end_date)}</DueTime>
+                      </DueTimeView>
+                    </TagView>
+                  </DetailsView>
+                )
+              }
+
+              <DetailsView>
+                <TagView>
+                  <Label>Priority:</Label>
+                  <TaskAttributesView taskAttributes={data.task_attributes[0]-1}>
+                    <DueTime>{taskAttributesArray[JSON.stringify(data.task_attributes[0]-1)]}</DueTime>
+                  </TaskAttributesView>
+                </TagView>
+              </DetailsView>
+
+              <DetailsView>
+                <TagView>
+                  <Label>Confirmation with photograph?</Label>
+                  <ToText>Sim</ToText>
+                </TagView>
+              </DetailsView>
+            </AlignDetailsView>
+
+            <DescriptionView>
+              <HrLine/>
+              <Label>Comments:</Label>
+              <DescriptionBorderView pastDueDate={pastDueDate()}>
+                <DescriptionSpan>{data.description}</DescriptionSpan>
+              </DescriptionBorderView>
+            </DescriptionView>
+
+            { data.status && data.status.status !== 1
+              ? (
+                <IconsView>
+                  <ButtonView onPress={handleMessageConversation}>
+                    <TaskIcon name="message-square"/>
+                  </ButtonView>
+                  { taskConditionIndex === 1
+                    ? (
+                      <ButtonView onPress={handleConfirm}>
+                        <ConfirmIcon name="check"/>
+                      </ButtonView>
+                    )
+                    : (
+                      <ButtonView>
+                        <ButtonIcon name="trash-2" style={{color: '#ccc'}}/>
+                      </ButtonView>
+                    )
+                  }
+                </IconsView>
+              )
+              : (
+                <AcceptButtonView>
+                  <ModalText>Accept this task?</ModalText>
+                  <ButtonWrapper>
+                    { taskConditionIndex === 1
+                      ? (
+                        <>
+                          <ButtonView onPress={() => setToggleModal(!toggleModal)}>
+                            <RejectButton>
+                            <ButtonText>Decline</ButtonText>
+                            </RejectButton>
+                          </ButtonView>
+                          <ButtonView onPress={handleToggleAccept}>
+                            <AcceptButton>
+                              <ButtonText>Accept</ButtonText>
+                            </AcceptButton>
+                          </ButtonView>
+                        </>
+                      )
+                      : (
+                        null
+                      )
+                    }
+                  </ButtonWrapper>
+                </AcceptButtonView>
+              )
+            }
+            { data.signature &&
+              <ImageWrapper>
+                <Label>Confirmation Photo:</Label>
+                <ImageView>
+                  <Image source={{ uri: data.signature.url }}/>
+                </ImageView>
+              </ImageWrapper>
+            }
+            <DescriptionView>
+              <BackButton onPress={handleToggleTask}>
+                <ButtonText>Back</ButtonText>
+              </BackButton>
+            </DescriptionView>
+
+            <Modal isVisible={toggleConfirmModal}>
+            <ModalView>
+              <AcceptButtonView>
+                <ModalText>Confirm and end this task?</ModalText>
+                <ButtonWrapper>
+                  <ButtonView onPress={() => setToggleConfirmModal(!toggleConfirmModal)}>
+                    <RejectButton>
+                      <ButtonText>Back</ButtonText>
+                    </RejectButton>
+                  </ButtonView>
+                  <ButtonView onPress={handleConfirmWithoutPhoto}>
+                    <AcceptButton>
+                      <ButtonText>Yes</ButtonText>
+                    </AcceptButton>
+                  </ButtonView>
+
                 </ButtonWrapper>
               </AcceptButtonView>
-            )
-          }
-          { data.signature &&
-            <ImageWrapper>
-              <Label>Confirmation Photo:</Label>
-              <ImageView>
-                <Image source={{ uri: data.signature.url }}/>
-              </ImageView>
-            </ImageWrapper>
-          }
-          <DescriptionView>
-            <BackButton onPress={handleToggleTask}>
-              <ButtonText>Back</ButtonText>
-            </BackButton>
-          </DescriptionView>
+              </ModalView>
+            </Modal>
 
-          <Modal isVisible={toggleModal}>
-            <ModalView>
-              <ModalText>Are you sure you wish to decline this task?</ModalText>
-              <RejectTaskInput
-                placeholder="Comentário"
-                value={rejectTaskInputValue}
-                onChangeText={setRejectTaskInputValue}
-                mutiline={true}
-              />
-              <DatesAndButtonView>
-                <ButtonView onPress={handleCancelTask}>
-                  <AcceptButton>
-                    <ButtonText>Yes</ButtonText>
-                  </AcceptButton>
-                </ButtonView>
-                <ButtonView onPress={() => setToggleModal(!toggleModal)}>
-                  <RejectButton>
-                  <ButtonText>Back</ButtonText>
-                  </RejectButton>
-                </ButtonView>
-              </DatesAndButtonView>
-            </ModalView>
-          </Modal>
+            <Modal isVisible={toggleModal}>
+              <ModalView>
+                <RejectTaskInput
+                  placeholder="Comments"
+                  value={rejectTaskInputValue}
+                  onChangeText={setRejectTaskInputValue}
+                  mutiline={true}
+                />
+                <AcceptButtonView>
+                  <ModalText>Are you sure you wish to decline this task?</ModalText>
+                  <ButtonWrapper>
+                    <ButtonView onPress={handleCancelTask}>
+                      <AcceptButton>
+                        <ButtonText>Yes</ButtonText>
+                      </AcceptButton>
+                    </ButtonView>
+                    <ButtonView onPress={() => setToggleModal(!toggleModal)}>
+                      <RejectButton>
+                      <ButtonText>Back</ButtonText>
+                      </RejectButton>
+                    </ButtonView>
+                  </ButtonWrapper>
+                </AcceptButtonView>
+              </ModalView>
+            </Modal>
 
-          <Modal isVisible={toggleConfirmModal}>
-            <ModalView>
-              <ModalText>Confirm and end this task?</ModalText>
-                {/* <DescriptionBorderView pastDueDate={pastDueDate()}> */}
-                {/* </DescriptionBorderView> */}
-              <DatesAndButtonView>
-                <ButtonView onPress={handleConfirmWithoutPhoto}>
-                  <AcceptButton>
-                    <ButtonText>Yes</ButtonText>
-                  </AcceptButton>
-                </ButtonView>
-                <ButtonView onPress={() => setToggleConfirmModal(!toggleConfirmModal)}>
-                  <RejectButton>
+            <Modal isVisible={togglePhotoModal}>
+              <ModalView>
+                <AcceptButtonView>
+                  <ModalText>Choose photo from:</ModalText>
+                  <ButtonWrapper>
+                    <ButtonView onPress={() => chooseFromLibrary()}>
+                      <AcceptButton>
+                        <ButtonText>Reel</ButtonText>
+                      </AcceptButton>
+                    </ButtonView>
+                    <ButtonView onPress={() => takePhotoFromCamera()}>
+                      <CameraButton>
+                        <ButtonText>Camera</ButtonText>
+                      </CameraButton>
+                    </ButtonView>
+                  </ButtonWrapper>
+                </AcceptButtonView>
+                <DescriptionView>
+                  <BackButton onPress={() => setTogglePhotoModal(!togglePhotoModal)}>
                     <ButtonText>Back</ButtonText>
-                  </RejectButton>
-                </ButtonView>
-              </DatesAndButtonView>
-            </ModalView>
-          </Modal>
+                  </BackButton>
+                </DescriptionView>
+              </ModalView>
+            </Modal>
 
-          <Modal isVisible={togglePhotoModal}>
-          <ModalView>
-            <ModalText>Choose photo from:</ModalText>
-            <DatesAndButtonView>
-              <ButtonView onPress={() => chooseFromLibrary()}>
-                <AcceptButton>
-                  <ButtonText>Reel</ButtonText>
-                </AcceptButton>
-              </ButtonView>
-              <ButtonView onPress={() => takePhotoFromCamera()}>
-                <CameraButton>
-                  <ButtonText>Camera</ButtonText>
-                </CameraButton>
-              </ButtonView>
-            </DatesAndButtonView>
-            <DatesAndButtonView>
-              <ButtonView onPress={() => setTogglePhotoModal(!togglePhotoModal)}>
-                <RejectButton>
-                  <ButtonText>Back</ButtonText>
-                </RejectButton>
-              </ButtonView>
-            </DatesAndButtonView>
-            </ModalView>
-          </Modal>
-
-        </FormScrollView>
+          </FormScrollView>
         </ModalView>
-
       </Modal>
 
       <Modal isVisible={sendingIndicator}>

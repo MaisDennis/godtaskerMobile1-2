@@ -5828,11 +5828,6 @@ react-native-otp-inputs@^6.0.0:
   resolved "https://registry.yarnpkg.com/react-native-otp-inputs/-/react-native-otp-inputs-6.0.0.tgz#93a58a8230dc6d5b160ffecde2d1ddfcf8efa626"
   integrity sha512-XqmF6HOyTkReTPF+l+Ne8KaYXCbmREYdEAd5a461FKXUNUH+Gew7I7BWMZUegK5X8n4u5HMXT++qGSoRbm7Jdg==
 
-react-native-paper-dates@^0.4.5:
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/react-native-paper-dates/-/react-native-paper-dates-0.4.5.tgz#d3013ec1ed4c1bbf4e7bc53c8425016893e29925"
-  integrity sha512-8eJoR35qE79c9JeTv97MBqt+BX2yT3TJ39vWPMgGQITzAPXk845jH5iSaQHpBUZLBCOhUfnEzbQXv4Se656Muw==
-
 react-native-paper@^4.8.1:
   version "4.8.1"
   resolved "https://registry.yarnpkg.com/react-native-paper/-/react-native-paper-4.8.1.tgz#ade4e552e2aaecfc3096c8aebda37bd99facf63f"

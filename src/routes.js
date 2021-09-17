@@ -9,7 +9,8 @@ import ContactCreate from './pages/Contacts/ContactCreatePage';
 import ContactEdit from './pages/Contacts/ContactEditPage';
 import ContactTasks from './pages/Contacts/ContactTasksPage';
 import Follow from './pages/Contacts/FollowPage';
-import WorkerPage from './pages/WorkerPage';
+
+import HeaderView from './components/HeaderRoutesView'
 
 import MessagesConversationPage from './pages/Messages/MessagesConversationPage/index';
 
@@ -26,7 +27,7 @@ import TaskEdit from './pages/Tasks/TaskEditPage';
 import UpdateProfile from './pages/UpdateProfile';
 // import UpdateProfilePhoto from './pages/UpdateProfilePhoto';
 
-import HeaderView from './components/HeaderRoutesView'
+import WorkerPage from './pages/WorkerPage';
 // -----------------------------------------------------------------------------
 const Stack = createStackNavigator();
 const headerBackVisible = false;
@@ -222,7 +223,7 @@ export default function App() {
             },
           }}
         />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="ContactEdit"
         component={ContactEdit}
         options={{
@@ -259,7 +260,7 @@ export default function App() {
             color: '#4433ee',
           },
         }}
-      />
+      /> */}
       <Stack.Screen
         name="MessagesConversationPage"
         component={MessagesConversationPage}

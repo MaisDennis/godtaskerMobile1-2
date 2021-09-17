@@ -56,7 +56,7 @@ export default function Messages({ data, navigation }) {
 
   useEffect(() => {
     getMessages()
-    console.log(user_name)
+    // console.log(user_name)
   }, [updatedMessage])
 
   async function getMessages() {

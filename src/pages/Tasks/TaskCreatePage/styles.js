@@ -161,14 +161,6 @@ export const ModalView = styled.View`
   /* background-color: #ff0; */
 `;
 
-export const ModalButtonWrapper = styled.View`
-display: flex;
-flex-direction: row;
-justify-content: space-between;
-width: 33%;
-margin-top: 12px;
-`;
-
 export const RadioButtonView = styled.View`
   display: flex;
   flex-direction: row;
@@ -212,7 +204,6 @@ export const RadioButtonLabelText = styled.Text`
   font-size: ${Platform.OS === 'ios' ? '15px' : '14px'};
   font-weight: bold;
   color: #000;
-
 `;
 
 export const RadioButtonOuter = styled.View`
@@ -410,12 +401,6 @@ export const SubTaskView = styled.View`
   height: auto;
   width: 100%;
   /* background-color: #f5f; */
-`;
-
-export const SubmitWrapper = styled.View`
-height: 100px;
-width: 100%;
-/* background-color: #4433ee; */
 `;
 
 export const TitleText = styled.Text`

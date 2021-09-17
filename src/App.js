@@ -40,10 +40,6 @@ export default function App() {
       const token = await messaging().getToken();
       console.log('Token: ', token)
       setTest(token)
-      // await api.put(`users/${userId}/notifications`, {
-      //   notification_token: token,
-      //   worker_id: workerId,
-      // })
     }
 
     messaging().onTokenRefresh(async token => {
@@ -78,11 +74,8 @@ export default function App() {
     //       )
     //     }
     //   })
-
   }
-
-
-
+  // ---------------------------------------------------------------------------
   return (
     <>
     {/* <View>

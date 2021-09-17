@@ -27,7 +27,7 @@ export default function TabRoutes({ navigation }) {
           tabBarIcon: ({ color }) => {
             let iconName;
             if (route.name === 'User') {
-              iconName = 'eye';
+              iconName = 'coffee';
             } else if (route.name === 'Worker') {
               iconName = 'briefcase';
             } else if (route.name === 'Messages') {
@@ -51,7 +51,7 @@ export default function TabRoutes({ navigation }) {
       >
         <Tab.Screen
           name="User"
-          component={Messages}
+          component={User}
           options={{ tabBarLabel: 'Boss' }}
         />
         <Tab.Screen
@@ -65,16 +65,16 @@ export default function TabRoutes({ navigation }) {
           options={{ tabBarLabel: 'Dashboard' }}
         />
         <Tab.Screen
-          name="Messages"
-          component={User}
-          options={{ tabBarLabel: 'Chat' }}
-        />
-
-        <Tab.Screen
           name="Contacts"
           component={Contacts}
           options={{ tabBarLabel: 'Search' }}
         />
+        <Tab.Screen
+          name="Messages"
+          component={Messages}
+          options={{ tabBarLabel: 'Chat' }}
+        />
+
       </Tab.Navigator>
     </>
   );

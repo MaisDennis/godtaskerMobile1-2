@@ -59,7 +59,7 @@ export default function Dashboard({ navigation }) {
   const [toggleBio, setToggleBio] = useState();
 
   const [countFollowers, setCountFollowers] = useState();
-  // const [countFollowing, setCountFollowing] = useState();
+  const [countFollowing, setCountFollowing] = useState();
   const [userCountSent, setUserCountSent] = useState();
   const [userCountInitiated, setUserCountInitiated] = useState();
   const [userCountFinished, setUserCountFinished] = useState();
@@ -103,7 +103,6 @@ export default function Dashboard({ navigation }) {
 
     const followingResponse = await api.get(`/users/${user_id}/following/count`)
     const followedResponse = await api.get(`/workers/${worker_id}/followed/count`)
-
     // console.log(user.data)
     setUserFirstName(user.data.first_name)
     setUserLastName(user.data.last_name)
@@ -114,7 +113,7 @@ export default function Dashboard({ navigation }) {
     setUserBio(user.data.bio)
 
     setCountFollowers(followedResponse.data)
-    // setCountFollowing(followingResponse.data)
+    setCountFollowing(followingResponse.data)
     setUserCountSent(userResponse.data.countSent)
     setUserCountInitiated(userResponse.data.countInitiated)
     setUserCountFinished(userResponse.data.countFinished)
@@ -301,8 +300,8 @@ export default function Dashboard({ navigation }) {
                   <LabelNormal>Followers</LabelNormal>
                 </FollowersView>
                 <FollowersView onPress={handleFollow}>
-                  <LabelBold>{countFollowers}</LabelBold>
-                  <LabelNormal>Followers</LabelNormal>
+                  <LabelBold>{countFollowing}</LabelBold>
+                  <LabelNormal>Following</LabelNormal>
                 </FollowersView>
               </FollowersWrapper>
             </UserInfoView>
@@ -330,6 +329,7 @@ export default function Dashboard({ navigation }) {
           <StatusView>
             <Label>Boss Status:</Label>
           </StatusView>
+
           <StatusView>
             <BlockSmallBoss>
               <LabelBoldBoss>
@@ -340,6 +340,7 @@ export default function Dashboard({ navigation }) {
               </LabelBoldBoss>
               <LabelNormalBoss>Sent</LabelNormalBoss>
             </BlockSmallBoss>
+
             <BlockSmallBoss>
               <LabelBoldBoss>
                 { userCountInitiated !== 0
@@ -397,8 +398,8 @@ export default function Dashboard({ navigation }) {
                   }
                 </LabelBoldBoss2>
                 <LabelBoldBoss2>
-                  { userCountSent !== 0
-                    ? userCountSent
+                  { userCountInitiated !== 0
+                    ? userCountInitiated
                     : '-'
                   }
                 </LabelBoldBoss2>
